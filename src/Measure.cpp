@@ -13,13 +13,12 @@ void Measure::setup() {
 }
 
 const Measurement Measure::measure() {
-    const Measurement measurement =  Measurement(
+    return Measurement(
         ina219.getShuntVoltage_mV(),
         ina219.getBusVoltage_V(),
         ina219.getCurrent_mA(),
         ina219.getPower_mW()
     );
-   return measurement;
 }
 
 const Measurement Measure::doNewMeasurement() {

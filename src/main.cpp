@@ -1,12 +1,13 @@
 #include <Arduino.h>
-#include <Wire.h>
 #include "Controlls.h"
 #include "Measure.h"
+#include "Display.h"
 
 
 
 volatile Controlls controlls(PIN2, PIN3);
 Measure measure(/*delay*/ 2000, Measure::C16V_400);
+Display lcd(0x27);
 
 void btn_interrupt_a() {
   controlls.buttonA.interrupt();
@@ -25,16 +26,20 @@ void setup(void)
       delay(1);
   }
 
+
   controlls.setup();
   attachInterrupt(digitalPinToInterrupt(controlls.buttonA.pin), btn_interrupt_a, CHANGE);
   attachInterrupt(digitalPinToInterrupt(controlls.buttonB.pin), btn_interrupt_b, CHANGE);
   measure.setup();
+  lcd.setup();  
+  lcd.printHello();
 }
 
 void loop(void) 
 {
   if (controlls.buttonA.checkIfButtonTriggeredAndReset()) {
     Serial.println("Button A triggered");
+    lcd.printHello();
   }
 
   if (controlls.buttonB.checkIfButtonTriggeredAndReset()) {
