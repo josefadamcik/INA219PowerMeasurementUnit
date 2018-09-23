@@ -1,4 +1,4 @@
-# Simple firmare for INA219 measurement unit with Arduion and LCD
+# Simple firmware for INA219 measurement unit with Arduino and LCD
 
 
 - INA291 breakout, i2c
@@ -6,6 +6,8 @@
 - 2buttons
 
 Work in progress.
+
+Uses PlatformIO.
 
 ## TODO
 
@@ -18,4 +20,4 @@ Work in progress.
 
 ## License
 
-MIT, see LICENSE.md
+MIT, see [LICENSE](LICENSE)
