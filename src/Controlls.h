@@ -20,6 +20,9 @@ class Button {
         volatile int lastState = HIGH;
         volatile unsigned long changeDebounceStarted;
         volatile boolean triggerObserved = false;
+        // Prevent copying
+        Button& operator = (const Button& other);
+        Button(const Button & other);
 };
 
 class Controlls {
@@ -29,6 +32,9 @@ class Controlls {
         volatile Button buttonA;
         volatile Button buttonB;
     private:
+        // Prevent copying
+        Controlls& operator = (const Controlls& other);
+        Controlls(const Controlls & other);
 };
 
 

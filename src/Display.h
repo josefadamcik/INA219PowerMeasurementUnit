@@ -12,8 +12,13 @@ class Display {
         Display(uint8_t addr): lcd(addr, 16, 2) {};
         void setup();
         void printHello();
+        void printValue(String title, float number, String unit);
+        void clear();
     private:
         LiquidCrystal_I2C lcd;  
+        // Prevent copying
+        Display & operator = (const Display & other);
+        Display(const Display & other);
 };
 
 #endif

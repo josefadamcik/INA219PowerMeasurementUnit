@@ -7,17 +7,16 @@
 
 class Measurement {
     public:
-        const float shuntvoltage;
-        const float busvoltage;
-        const float current_mA;
-        const float loadvoltage;
-        const float power_mW;
+        float shuntvoltage;
+        float busvoltage;
+        float current_mA;
+        float loadvoltage;
+        float power_mW;
         Measurement(float shuntvoltagea, float busvoltage, float current_mA, float power_mW) :
             shuntvoltage(shuntvoltagea), busvoltage(busvoltage), current_mA(current_mA), 
             loadvoltage(busvoltage + (shuntvoltage / 1000)), 
             power_mW(power_mW) {};
     private:
-       // Measurement(const Measurement&);   //prevent copy constructor
 };
 
 
