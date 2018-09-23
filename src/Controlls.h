@@ -10,7 +10,11 @@
 class Button {
     public:
         Button(int pin): pin(pin) {};
-        void setup() volatile;
+        /**
+         * Pass a function for interrupt handling. The function should just call
+         * button.interrupt();
+         */ 
+        void setup(void (*userFunc)(void)) volatile;
         void interrupt() volatile;
         bool checkIfButtonTriggeredAndReset() volatile;
         const int pin;
@@ -24,19 +28,6 @@ class Button {
         Button& operator = (const Button& other);
         Button(const Button & other);
 };
-
-class Controlls {
-    public:
-        Controlls(int pinA, int pinB):  buttonA(pinA), buttonB(pinB) {};
-        void setup() volatile;
-        volatile Button buttonA;
-        volatile Button buttonB;
-    private:
-        // Prevent copying
-        Controlls& operator = (const Controlls& other);
-        Controlls(const Controlls & other);
-};
-
 
 
 #endif //ifndef INC_CONTROLLS

@@ -1,16 +1,14 @@
 #include "Controlls.h"
 
+void Button::setup(void (*interruptfunc)(void)) volatile {
+    pinMode(pin, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(pin), interruptfunc, CHANGE);
+}
+
+
 /**
  * Button interrupt and debouncing.
  */ 
-
-
-
-
-void Button::setup() volatile {
-    pinMode(pin, INPUT_PULLUP);
-}
-
 void  Button::interrupt() volatile {
     int buttonState = digitalRead(pin);
     if (lastState == HIGH && buttonState == LOW) { // button press, start deboucne
@@ -36,8 +34,4 @@ bool Button::checkIfButtonTriggeredAndReset() volatile {
     }
 }
 
-void Controlls::setup() volatile{
-    buttonA.setup();
-    buttonB.setup();
-}
 

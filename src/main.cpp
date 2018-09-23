@@ -6,20 +6,20 @@
 
 
 
-volatile Controlls controlls(PIN2, PIN3);
-Measure measure(/*delay*/ 2000, Measure::C16V_400);
+volatile Button buttonA(PIN2);
+volatile Button buttonB(PIN3);
+Measure measure(/*delay*/ 5000, Measure::C16V_400);
 Display lcd(0x27);
 UserInterface ui(lcd);
 Measurement lastMeasurement(0,0,0,0);
 
 void btn_interrupt_a() {
-  controlls.buttonA.interrupt();
+  buttonA.interrupt();
 }
 
 void btn_interrupt_b() {
-  controlls.buttonB.interrupt();
+  buttonB.interrupt();
 }
-
 
 void setup(void) 
 {
@@ -29,9 +29,8 @@ void setup(void)
       delay(1);
   }
 
-  controlls.setup();
-  attachInterrupt(digitalPinToInterrupt(controlls.buttonA.pin), btn_interrupt_a, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(controlls.buttonB.pin), btn_interrupt_b, CHANGE);
+  buttonA.setup(btn_interrupt_a);
+  buttonB.setup(btn_interrupt_b);
   measure.setup();
   ui.setup();
 }
@@ -50,11 +49,12 @@ void loop(void)
     ui.updateLastMeasurement(lastMeasurement);
   }
 
-  if (controlls.buttonA.checkIfButtonTriggeredAndReset()) {
+  if (buttonA.checkIfButtonTriggeredAndReset()) {
     Serial.println("Button A triggered");
+    ui.mainButtonTriggered();
   }
 
-  if (controlls.buttonB.checkIfButtonTriggeredAndReset()) {
+  if (buttonB.checkIfButtonTriggeredAndReset()) {
     Serial.println("Button B triggered");
   }
 

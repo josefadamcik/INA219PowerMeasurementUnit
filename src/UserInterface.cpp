@@ -40,7 +40,17 @@ void UserInterface::loopAuto() {
 }
 
 void UserInterface::loopUser() {
-
+    if (mainButtonWasTriggered) {
+        mainButtonWasTriggered = false; //consume event
+        nextScreen();
+        renderScreen(screen);
+    } else if (lastUserInteraction + autoUserModeReset <= millis()) {
+        //auto quit user mode -> reset to auto mode.
+        lastUserInteraction = 0;
+        mode = Auto;
+        screen = Welcome;
+        renderScreen(screen);
+    }
 }
 
 void UserInterface::nextScreen() {
@@ -65,9 +75,19 @@ void UserInterface::renderScreen(Screen scrToRender) {
         case Power:
             display.printValue("Power", lastMeasurement.power_mW, "mW");
             break;
-        defualt:
+        default:
             display.clear();   
     }
+}
+
+void UserInterface::mainButtonTriggered() {
+    if (mode == Auto) {
+        mode = User;
+    }
+
+    lastUserInteraction = millis();
+    mainButtonWasTriggered = true;
+
 }
 
 

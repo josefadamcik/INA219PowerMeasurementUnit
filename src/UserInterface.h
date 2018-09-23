@@ -13,9 +13,13 @@ class UserInterface {
         void setup();
         void loop();
         void updateLastMeasurement(const Measurement& measurement);
+        void mainButtonTriggered();
     private:
         const unsigned long autoModeDelay = 2000;
+        const unsigned long autoUserModeReset = 5000;
         unsigned long lastAutoChange = 0;
+        unsigned long lastUserInteraction = 0;
+        bool mainButtonWasTriggered = false;
         Screen screen = None;
         Display& display;
         Mode mode = Auto; 
