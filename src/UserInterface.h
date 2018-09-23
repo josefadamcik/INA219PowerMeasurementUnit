@@ -10,15 +10,18 @@ class UserInterface {
         enum Mode { Auto, User };
         enum Screen { None, Welcome, Voltage, Current, Power, LastScr };
         UserInterface(Display& display): display(display), lastMeasurement(0,0,0,0) {};
-        void setup();
+        void setup(const Measure::Calibration& calibration);
         void loop();
         void updateLastMeasurement(const Measurement& measurement);
         void mainButtonTriggered();
+        void updateCalibration(const Measure::Calibration& calibration);
+        const String getCalibrationString() const;
     private:
         const unsigned long autoModeDelay = 2000;
         const unsigned long autoUserModeReset = 5000;
         unsigned long lastAutoChange = 0;
         unsigned long lastUserInteraction = 0;
+        Measure::Calibration currentCalibration = Measure::C16V_400;
         bool mainButtonWasTriggered = false;
         Screen screen = None;
         Display& display;
@@ -28,6 +31,7 @@ class UserInterface {
         void loopUser();
         void nextScreen();
         void renderScreen(Screen scrToRender);
+        void resetModeToAuto();
 
 };
 

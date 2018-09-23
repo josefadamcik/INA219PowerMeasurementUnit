@@ -32,7 +32,7 @@ void setup(void)
   buttonA.setup(btn_interrupt_a);
   buttonB.setup(btn_interrupt_b);
   measure.setup();
-  ui.setup();
+  ui.setup(measure.getCalibration());
 }
 
 void loop(void) 
@@ -56,6 +56,7 @@ void loop(void)
 
   if (buttonB.checkIfButtonTriggeredAndReset()) {
     Serial.println("Button B triggered");
+    ui.updateCalibration(measure.nextCalibration());
   }
 
 

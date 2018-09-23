@@ -1,7 +1,7 @@
 # Simple firmware for INA219 measurement unit with Arduino and LCD
 
 
-- INA291 breakout, i2c
+- INA219 breakout, i2c
 - 16x2 LCD, i2c
 - 2buttons
 

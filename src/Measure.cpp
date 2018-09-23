@@ -1,15 +1,23 @@
 #include "Measure.h"
 
+Measure::Calibration& operator++(Measure::Calibration& screen)
+{
+    assert(screen != Measure::C16V_400);
+    return screen = static_cast<Measure::Calibration>( screen + 1 );
+}
+
+Measure::Calibration operator++(Measure::Calibration& screen, int)
+{
+  assert(screen != Measure::C16V_400);
+  Measure::Calibration tmp(screen);
+  ++screen;
+  return tmp;
+}
+
 
 void Measure::setup() {
-  // Initialize the INA219.
-  // By default the initialization will use the largest range (32V, 2A).  However
-  // you can call a setCalibration function to change this range (see comments).
   ina219.begin();
-  // To use a slightly lower 32V, 1A range (higher precision on amps):
-  //ina219.setCalibration_32V_1A();
-  // Or to use a lower 16V, 400mA range (higher precision on volts and amps):
-  ina219.setCalibration_16V_400mA();
+  configureIna(calibration);
 }
 
 const Measurement Measure::measure() {
@@ -28,4 +36,33 @@ const Measurement Measure::doNewMeasurement() {
 
 bool Measure::didIntervalElapsed() const {
     return lastMeasurement == 0 ||  millis() >= lastMeasurement + interval;
+}
+
+
+Measure::Calibration Measure::nextCalibration() {
+    if (calibration == C16V_400) {
+        calibration = C32V_2A;
+    } else {
+        calibration++;
+    }
+    configureIna(calibration);
+    return calibration;
+}
+
+Measure::Calibration Measure::getCalibration() const {
+    return calibration;
+}
+
+void Measure::configureIna(const Measure::Calibration& cal) {
+    switch (cal) {
+        case Measure::C16V_400:
+            ina219.setCalibration_16V_400mA();
+            break;
+        case Measure::C32V_1A:
+            ina219.setCalibration_32V_1A();
+            break;
+        case Measure::C32V_2A:
+            ina219.setCalibration_32V_2A();
+            break;
+    }
 }

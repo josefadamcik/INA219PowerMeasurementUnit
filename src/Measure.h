@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Adafruit_INA219.h>
+#include <assert.h>
 
 #ifndef INC_MEASURE
 #define INC_MEASURE
@@ -36,13 +37,16 @@ class Measure {
          * Does the measurement and resets the last measurement time.
          */
         const Measurement doNewMeasurement();
+        Calibration nextCalibration();
+        Calibration getCalibration() const;
     private:
         const unsigned long interval;
-        const Calibration calibration;
+        Calibration calibration;
         unsigned long lastMeasurement = 0;
         Measure(const Measure&);   //prevent copy constructor
         Adafruit_INA219 ina219;
         const Measurement measure();
+        void configureIna(const Measure::Calibration& cal);
 };
 
 

@@ -11,8 +11,8 @@ class Display {
     public:
         Display(uint8_t addr): lcd(addr, 16, 2) {};
         void setup();
-        void printHello();
-        void printValue(String title, float number, String unit);
+        void printHello(const String& secondRow);
+        void printValue(const String& title, const float& number, const String& unit);
         void clear();
     private:
         LiquidCrystal_I2C lcd;  
