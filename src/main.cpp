@@ -40,22 +40,22 @@ void loop(void)
 
   if (measure.didIntervalElapsed()) {
     lastMeasurement = measure.doNewMeasurement();
-    Serial.print("Bus Voltage:   "); Serial.print(lastMeasurement.busvoltage); Serial.println(" V");
-    Serial.print("Shunt Voltage: "); Serial.print(lastMeasurement.shuntvoltage); Serial.println(" mV");
-    Serial.print("Load Voltage:  "); Serial.print(lastMeasurement.loadvoltage); Serial.println(" V");
-    Serial.print("Current:       "); Serial.print(lastMeasurement.current_mA); Serial.println(" mA");
-    Serial.print("Power:         "); Serial.print(lastMeasurement.power_mW); Serial.println(" mW");
-    Serial.println("");
+    Serial.print(F("Bus Voltage:   ")); Serial.print(lastMeasurement.busvoltage); Serial.println(F(" V"));
+    Serial.print(F("Shunt Voltage: ")); Serial.print(lastMeasurement.shuntvoltage); Serial.println(F(" mV"));
+    Serial.print(F("Load Voltage:  ")); Serial.print(lastMeasurement.loadvoltage); Serial.println(F(" V"));
+    Serial.print(F("Current:       ")); Serial.print(lastMeasurement.current_mA); Serial.println(F(" mA"));
+    Serial.print(F("Power:         ")); Serial.print(lastMeasurement.power_mW); Serial.println(F(" mW"));
+    Serial.println();
     ui.updateLastMeasurement(lastMeasurement);
   }
 
   if (buttonA.checkIfButtonTriggeredAndReset()) {
-    Serial.println("Button A triggered");
+    Serial.println(F("Button A triggered"));
     ui.mainButtonTriggered();
   }
 
   if (buttonB.checkIfButtonTriggeredAndReset()) {
-    Serial.println("Button B triggered");
+    Serial.println(F("Button B triggered"));
     ui.updateCalibration(measure.nextCalibration());
   }
 

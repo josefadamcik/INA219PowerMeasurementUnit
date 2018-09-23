@@ -77,13 +77,13 @@ void UserInterface::renderScreen(Screen scrToRender) {
             display.printHello(getCalibrationString());
             break;
         case Voltage:
-            display.printValue("Voltage", lastMeasurement.loadvoltage * 1000, "mV");
+            display.printValue(F("Voltage"), lastMeasurement.loadvoltage * 1000, F("mV"));
             break;
         case Current:
-            display.printValue("Current", lastMeasurement.current_mA, "mA");
+            display.printValue(F("Current"), lastMeasurement.current_mA, F("mA"));
             break;
         case Power:
-            display.printValue("Power", lastMeasurement.power_mW, "mW");
+            display.printValue(F("Power"), lastMeasurement.power_mW, F("mW"));
             break;
         default:
             display.clear();   
@@ -93,13 +93,13 @@ void UserInterface::renderScreen(Screen scrToRender) {
 const String UserInterface::getCalibrationString() const {
     switch(currentCalibration) {
         case Measure::C16V_400:
-            return "16V 400mA";
+            return F("16V 400mA");
         case Measure::C32V_1A:
-            return "32V 1A";
+            return F("32V 1A");
         case Measure::C32V_2A:
-            return "32V 2A";
+            return F("32V 2A");
     }
-    return "n/a";
+    return F("n/a");
 }
 
 void UserInterface::mainButtonTriggered() {

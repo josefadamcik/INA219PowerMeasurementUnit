@@ -8,7 +8,7 @@ void Display::printHello(const String& secondRow) {
     lcd.clear();
     lcd.home ();
     lcd.backlight();
-    lcd.print("Hello, INA219");  
+    lcd.print(F("Hello, INA219"));  
     lcd.setCursor(0,1);
     lcd.print(secondRow);
 }
