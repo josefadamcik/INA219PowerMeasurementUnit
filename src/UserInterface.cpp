@@ -64,7 +64,7 @@ void UserInterface::resetModeToAuto() {
 
 
 void UserInterface::nextScreen() {
-    if (screen == Power) { //the last one
+    if (screen == LastScr - 1) { //the last one
         screen = Welcome;
     } else {
         screen++;
@@ -84,6 +84,12 @@ void UserInterface::renderScreen(Screen scrToRender) {
             break;
         case Power:
             display.printValue(F("Power"), lastMeasurement.power_mW, F("mW"));
+            break;
+        case Energy:
+            display.printValue(F("Energy"), lastMeasurement.energy_mWh, F("mWh"));
+            break;
+        case EnergyTime:
+            display.printValue(F("Energy time"), lastMeasurement.energyMillis / 1000, F("s"));
             break;
         default:
             display.clear();   

@@ -8,8 +8,8 @@
 class UserInterface {
     public:
         enum Mode { Auto, User };
-        enum Screen { None, Welcome, Voltage, Current, Power, LastScr };
-        UserInterface(Display& display): display(display), lastMeasurement(0,0,0,0) {};
+        enum Screen { None, Welcome, Voltage, Current, Power, Energy, EnergyTime, LastScr };
+        UserInterface(Display& display): display(display), lastMeasurement(0,0,0,0,0,0,0) {};
         void setup(const Measure::Calibration& calibration);
         void loop();
         void updateLastMeasurement(const Measurement& measurement);

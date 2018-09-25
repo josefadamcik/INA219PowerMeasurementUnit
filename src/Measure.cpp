@@ -1,5 +1,7 @@
 #include "Measure.h"
 
+const unsigned long millisInHour = 3600000;
+
 Measure::Calibration& operator++(Measure::Calibration& screen)
 {
     assert(screen != Measure::C16V_400);
@@ -20,18 +22,31 @@ void Measure::setup() {
   configureIna(calibration);
 }
 
-const Measurement Measure::measure() {
+
+const Measurement Measure::doNewMeasurement() {
+    float power_mW = ina219.getPower_mW();
+    unsigned long now = millis();
+    // Serial.print("now "); Serial.print(now); Serial.print(" last "); Serial.println(lastMeasurement);
+    //compute estimated energy
+    //energy = power * time = delta(elergy) + power * delta(time); unit = mW * h = mWh
+    //TODO: beware float arithmetics
+    float deltaEnergy = (power_mW * (now - max(lastMeasurement, energyEstimateResetMillis))) / (float)millisInHour ;
+    // Serial.println(power_mW * (now - lastMeasurement));
+    // Serial.println((float)millisInHour);
+    // Serial.println((power_mW * (now - lastMeasurement)) / (float)millisInHour);
+    // Serial.println(deltaEnergy);
+    energyEstimate += deltaEnergy;
+    
+    lastMeasurement = now;
     return Measurement(
         ina219.getShuntVoltage_mV(),
         ina219.getBusVoltage_V(),
         ina219.getCurrent_mA(),
-        ina219.getPower_mW()
+        power_mW,
+        energyEstimate,
+        now - energyEstimateResetMillis,
+        deltaEnergy
     );
-}
-
-const Measurement Measure::doNewMeasurement() {
-    lastMeasurement = millis();
-    return measure();
 }
 
 bool Measure::didIntervalElapsed() const {
@@ -65,4 +80,9 @@ void Measure::configureIna(const Measure::Calibration& cal) {
             ina219.setCalibration_32V_2A();
             break;
     }
+}
+
+void Measure::resetEnergyEstimate() {
+    energyEstimate = 0;
+    energyEstimateResetMillis = millis();
 }

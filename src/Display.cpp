@@ -23,7 +23,7 @@ void Display::printValue(const String& title, const float& number, const String&
     lcd.print(title);
     lcd.setCursor(0,1);
     lcd.print(number);
-    lcd.setCursor(14,1);
+    lcd.setCursor(16 - unit.length(),1);
     lcd.print(unit);
 }
         
