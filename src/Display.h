@@ -13,6 +13,7 @@ class Display {
         void setup();
         void printHello(const String& secondRow);
         void printValue(const String& title, const float& number, const String& unit);
+        void printMenuRow(byte row, bool selected, const char* content);
         void clear();
     private:
         LiquidCrystal_I2C lcd;  

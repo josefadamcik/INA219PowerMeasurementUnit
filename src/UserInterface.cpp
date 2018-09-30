@@ -14,10 +14,67 @@ void UserInterface::updateLastMeasurement(const Measurement& measurement) {
 }
 
 void UserInterface::loop() {
-    if (mode == Auto) {
-        loopAuto();
-    } else if (mode == User) {
-        loopUser();
+    if (processButtonOnNextLoop != NoButton) {
+        switch (processButtonOnNextLoop) {
+            case UserInterface::Primary:
+                if (mode == ModeAuto) {
+                    mode = ModeUser;
+                    nextScreen();
+                    renderScreen(screen);
+                } else if (mode == ModeUser) {
+                    nextScreen();
+                    renderScreen(screen);
+                } else if (mode == ModeMenu) {
+                    menu.scrollToNext();
+                }
+                break;
+            case UserInterface::Secondary:
+                if (mode == ModeMenu) {
+                    //select the item
+                    if (menu.displayedSubmenu == Menu::NoMenu) {
+                        if (menu.displayedItemInMenu == Menu::Exit) {
+                            //we are exiting the menu
+                            resetModeToAuto();
+                            screen = Welcome;
+                            renderScreen(screen);
+                        } else {
+                            menu.enterSubmenu();
+                        }
+                    } else if (menu.displayedItemInMenu == Menu::Exit) {
+                        menu.exitSubmenu();
+                    } else if (menu.displayedSubmenu == Menu::Calibration) {
+                        //todo: select calibration
+                        menu.exitSubmenu();
+                    } else if (menu.displayedSubmenu == Menu::MeasurementInterval) {
+                        //todo: select calibration
+                        menu.exitSubmenu();
+                    } else if (menu.displayedSubmenu == Menu::ResetEnergyMeasurement) {
+                        //todo: do reset
+                        menu.exitSubmenu();
+                    }
+                } else {
+                    mode = ModeMenu;
+                    menu.enterMenu();
+                }
+                break;
+            case NoButton:
+                //nop, shouldn't happen
+                break;
+        }
+        processButtonOnNextLoop = NoButton;
+    } else {
+        if (mode == ModeAuto) {
+            if (lastAutoChange == 0 || lastAutoChange + autoModeDelay <= millis()) {
+                lastAutoChange = millis();
+                nextScreen();
+                renderScreen(screen);
+            }
+        } else if (lastUserInteraction + autoUserModeReset <= millis()) {
+            //auto quit user mode -> reset to auto mode.
+            resetModeToAuto();
+            screen = Welcome;
+            renderScreen(screen);
+        }
     }
 }
 
@@ -40,22 +97,79 @@ void UserInterface::updateCalibration(const Measure::Calibration& calibration) {
 } 
 
 void UserInterface::buttonTriggered(UserInterface::Button button) {
-    switch (button) {
-        case UserInterface::Primary:
-            if (mode == Auto) {
-                mode = User;
-            } else if (mode == User) {
-                lastUserInteraction = millis();
-                mainButtonWasTriggered = true;
-            }
-            break;
-        case UserInterface::Secondary:
-            break;
+    lastUserInteraction = millis();
+    processButtonOnNextLoop = button;
+}
+
+// PRIAVTE Menu
+
+
+//top level menu - string in promem
+// const char _top_menu_0[] PROGMEM = "";
+// const char _top_menu_1[] PROGMEM = "Menu";
+// const char _top_menu_2[] PROGMEM = "Calibration";
+// const char _top_menu_3[] PROGMEM = "Interval";
+// const char _top_menu_4[] PROGMEM = "Reset energy";
+// const char _top_menu_5[] PROGMEM = "Exit";
+// const char* const _top_menu_table[] PROGMEM = {_top_menu_0, _top_menu_1, _top_menu_2, _top_menu_3, _top_menu_4, _top_menu_5};
+
+
+const char _top_menu_0[] = "";
+const char _top_menu_1[] = "Menu";
+const char _top_menu_2[] = "Calibration";
+const char _top_menu_3[] = "Interval";
+const char _top_menu_4[] = "Reset energy";
+const char _top_menu_5[] = "Exit";
+const char* const _top_menu_table[] = {_top_menu_0, _top_menu_1, _top_menu_2, _top_menu_3, _top_menu_4, _top_menu_5};
+
+
+void UserInterface::Menu::enterMenu() {
+    displayedItemInMenu = Menu::Welcome;
+    renderMenu();
+}
+
+void UserInterface::Menu::scrollToNext() {
+    if (displayedItemInMenu == Menu::Exit) {
+        displayedItemInMenu = Menu::Welcome;
+    } else {
+        displayedItemInMenu++;
+    }
+    renderMenu();
+}
+
+void UserInterface::Menu::enterSubmenu() {
+    displayedSubmenu = displayedItemInMenu;
+}
+
+void UserInterface::Menu::renderMenu() {
+    // static char firstLineBuffer[16];
+    // static char secondLineBuffer[16];
+
+    if (displayedItemInMenu == Exit) {
+        display.clear();
+        display.printMenuRow(0, false, _top_menu_table[4]);
+        display.printMenuRow(1, true, _top_menu_table[5]);
+    } else {
+        display.clear();
+        display.printMenuRow(0, true, _top_menu_table[displayedItemInMenu]);
+        display.printMenuRow(1, false, _top_menu_table[displayedItemInMenu + 1]);
     }
 }
 
+void UserInterface::Menu::renderSubmenu() {
 
-// PRIVATE
+}
+
+void UserInterface::Menu::exitSubmenu() {
+    displayedItemInMenu = displayedSubmenu;
+    displayedSubmenu = NoMenu;
+    renderMenu();
+}
+
+// PRIVATE UserInterface
+
+
+
 
 UserInterface::Screen& operator++(UserInterface::Screen& screen)
 {
@@ -71,47 +185,31 @@ UserInterface::Screen operator++(UserInterface::Screen& screen, int)
   return tmp;
 }
 
-UserInterface::MenuLevel1Screen& operator++(UserInterface::MenuLevel1Screen& screen)
+UserInterface::Menu::MenuItem& operator++(UserInterface::Menu::MenuItem& screen)
 {
-    assert(screen != UserInterface::Exit);
-    return screen = static_cast<UserInterface::MenuLevel1Screen>( screen + 1 );
+    assert(screen != UserInterface::Menu::Exit);
+    return screen = static_cast<UserInterface::Menu::MenuItem>( screen + 1 );
 }
 
-UserInterface::MenuLevel1Screen operator++(UserInterface::MenuLevel1Screen& screen, int)
+UserInterface::Menu::MenuItem operator++(UserInterface::Menu::MenuItem& screen, int)
 {
-  assert(screen != UserInterface::Exit);
-  UserInterface::MenuLevel1Screen tmp(screen);
+  assert(screen != UserInterface::Menu::Exit);
+  UserInterface::Menu::MenuItem tmp(screen);
   ++screen;
   return tmp;
 }
 
 void UserInterface::loopAuto() {
-    if (lastAutoChange == 0 || lastAutoChange + autoModeDelay <= millis()) {
-        lastAutoChange = millis();
-        nextScreen();
-        renderScreen(screen);
-    }
 }
 
 void UserInterface::loopUser() {
-    if (mainButtonWasTriggered) {
-        mainButtonWasTriggered = false; //consume event
-        nextScreen();
-        renderScreen(screen);
-    } else if (lastUserInteraction + autoUserModeReset <= millis()) {
-        //auto quit user mode -> reset to auto mode.
-        resetModeToAuto();
-        screen = Welcome;
-        renderScreen(screen);
-    }
 }
 
 void UserInterface::resetModeToAuto() {
-    mainButtonWasTriggered = false;
+    processButtonOnNextLoop = NoButton;
     lastUserInteraction = 0;
     lastAutoChange = 0;
-    mode = Auto;
-
+    mode = ModeAuto;
 }
 
 void UserInterface::nextScreen() {

@@ -1,7 +1,11 @@
 #include "Display.h"
+#include "assert.h"
 
+//see https://maxpromer.github.io/LCD-Character-Creator/
+uint8_t arrow[8] = {0x00, 0x08, 0x0C, 0x0E, 0x0F, 0x0E, 0x0C, 0x08};
 void Display::setup() {
     lcd.init();
+    lcd.createChar(0, arrow);
 }
 
 void Display::printHello(const String& secondRow) {
@@ -26,4 +30,16 @@ void Display::printValue(const String& title, const float& number, const String&
     lcd.setCursor(16 - unit.length(),1);
     lcd.print(unit);
 }
-        
+
+
+void Display::printMenuRow(byte row, bool selected, const char* content) {
+    assert(row == 0 || row == 1);
+    lcd.setCursor(0, row);
+    if (selected) {
+        lcd.write(0);
+        lcd.print(F(" "));
+    } else {
+        lcd.print(F("  "));
+    }
+    lcd.print(content);
+}

@@ -39,8 +39,8 @@
  */ 
 class UserInterface {
     public:
-        enum Button { Primary, Secondary };
-        UserInterface(Display& display): display(display), lastMeasurement(0,0,0,0,0,0,0) {};
+        enum Button { Primary, Secondary, NoButton };
+        UserInterface(Display& display): display(display),  menu(display), lastMeasurement(0,0,0,0,0,0,0)  {};
         void setup(const Measure::Calibration& calibration);
         void loop();
         void updateLastMeasurement(const Measurement& measurement);
@@ -48,28 +48,46 @@ class UserInterface {
         void updateCalibration(const Measure::Calibration& calibration);
         const String getCalibrationString() const;
     private:
-        enum Mode { Auto, User, Menu };
-        enum MenuLevel1Screen { Calibration, MeasurementInterval, ResetEnergyMeasurement, Exit};
+        enum Mode { ModeAuto, ModeUser, ModeMenu };
         enum Screen { None, Welcome, Voltage, Current, Power, Energy, EnergyTime, LastScr };
+        class Menu {
+            enum MenuItem { NoMenu, Welcome, Calibration, MeasurementInterval, ResetEnergyMeasurement, Exit};
+            Menu(Display& display): display(display) {}; 
+            MenuItem displayedItemInMenu = Welcome;
+            MenuItem displayedSubmenu = NoMenu;
+            Display& display;
+            friend UserInterface::Menu::MenuItem& operator++(UserInterface::Menu::MenuItem& screen);
+            friend UserInterface::Menu::MenuItem operator++(UserInterface::Menu::MenuItem& screen, int);
+            void enterMenu();
+            void renderMenu();
+            void scrollToNext();
+            void exitSubmenu();
+            void renderSubmenu();
+            void enterSubmenu();
+            friend UserInterface;
+        };
         const unsigned long autoModeDelay = 2000;
         const unsigned long autoUserModeReset = 5000;
         unsigned long lastAutoChange = 0;
         unsigned long lastUserInteraction = 0;
         Measure::Calibration currentCalibration = Measure::C16V_400;
-        bool mainButtonWasTriggered = false;
+        Button processButtonOnNextLoop = NoButton;
         Screen screen = None;
         Display& display;
-        Mode mode = Auto; 
+        Mode mode = ModeAuto; 
+        Menu menu;
         Measurement lastMeasurement;
         void loopAuto();
         void loopUser();
         void nextScreen();
         void renderScreen(Screen scrToRender);
         void resetModeToAuto();
-        friend UserInterface::MenuLevel1Screen& operator++(UserInterface::MenuLevel1Screen& screen);
-        friend UserInterface::MenuLevel1Screen operator++(UserInterface::MenuLevel1Screen& screen, int);
+        friend Menu;
         friend UserInterface::Screen& operator++(UserInterface::Screen& screen);
         friend UserInterface::Screen operator++(UserInterface::Screen& screen, int);
+        friend UserInterface::Menu::MenuItem& operator++(UserInterface::Menu::MenuItem& screen);
+        friend UserInterface::Menu::MenuItem operator++(UserInterface::Menu::MenuItem& screen, int);
+        
 
 
 };
