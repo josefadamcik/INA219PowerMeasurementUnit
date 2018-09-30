@@ -53,12 +53,12 @@ void loop(void)
 
   if (buttonA.checkIfButtonTriggeredAndReset()) {
     Serial.println(F("Button A triggered"));
-    ui.mainButtonTriggered();
+    ui.buttonTriggered(UserInterface::Primary);
   }
 
   if (buttonB.checkIfButtonTriggeredAndReset()) {
     Serial.println(F("Button B triggered"));
-    ui.updateCalibration(measure.nextCalibration());
+    ui.buttonTriggered(UserInterface::Secondary);
   }
 
 

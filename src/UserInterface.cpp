@@ -1,18 +1,6 @@
 #include "UserInterface.h"
 
-UserInterface::Screen& operator++(UserInterface::Screen& screen)
-{
-    assert(screen != UserInterface::LastScr);
-    return screen = static_cast<UserInterface::Screen>( screen + 1 );
-}
-
-UserInterface::Screen operator++(UserInterface::Screen& screen, int)
-{
-  assert(screen != UserInterface::LastScr);
-  UserInterface::Screen tmp(screen);
-  ++screen;
-  return tmp;
-}
+// PUBLIC
 
 void UserInterface::setup(const Measure::Calibration& calibration) {
   currentCalibration = calibration;
@@ -31,6 +19,70 @@ void UserInterface::loop() {
     } else if (mode == User) {
         loopUser();
     }
+}
+
+const String UserInterface::getCalibrationString() const {
+    switch(currentCalibration) {
+        case Measure::C16V_400:
+            return F("16V 400mA");
+        case Measure::C32V_1A:
+            return F("32V 1A");
+        case Measure::C32V_2A:
+            return F("32V 2A");
+    }
+    return F("n/a");
+}
+
+void UserInterface::updateCalibration(const Measure::Calibration& calibration) {
+    currentCalibration = calibration;
+    resetModeToAuto();
+    screen = None;
+} 
+
+void UserInterface::buttonTriggered(UserInterface::Button button) {
+    switch (button) {
+        case UserInterface::Primary:
+            if (mode == Auto) {
+                mode = User;
+            } else if (mode == User) {
+                lastUserInteraction = millis();
+                mainButtonWasTriggered = true;
+            }
+            break;
+        case UserInterface::Secondary:
+            break;
+    }
+}
+
+
+// PRIVATE
+
+UserInterface::Screen& operator++(UserInterface::Screen& screen)
+{
+    assert(screen != UserInterface::LastScr);
+    return screen = static_cast<UserInterface::Screen>( screen + 1 );
+}
+
+UserInterface::Screen operator++(UserInterface::Screen& screen, int)
+{
+  assert(screen != UserInterface::LastScr);
+  UserInterface::Screen tmp(screen);
+  ++screen;
+  return tmp;
+}
+
+UserInterface::MenuLevel1Screen& operator++(UserInterface::MenuLevel1Screen& screen)
+{
+    assert(screen != UserInterface::Exit);
+    return screen = static_cast<UserInterface::MenuLevel1Screen>( screen + 1 );
+}
+
+UserInterface::MenuLevel1Screen operator++(UserInterface::MenuLevel1Screen& screen, int)
+{
+  assert(screen != UserInterface::Exit);
+  UserInterface::MenuLevel1Screen tmp(screen);
+  ++screen;
+  return tmp;
 }
 
 void UserInterface::loopAuto() {
@@ -61,7 +113,6 @@ void UserInterface::resetModeToAuto() {
     mode = Auto;
 
 }
-
 
 void UserInterface::nextScreen() {
     if (screen == LastScr - 1) { //the last one
@@ -95,35 +146,4 @@ void UserInterface::renderScreen(Screen scrToRender) {
             display.clear();   
     }
 }
-
-const String UserInterface::getCalibrationString() const {
-    switch(currentCalibration) {
-        case Measure::C16V_400:
-            return F("16V 400mA");
-        case Measure::C32V_1A:
-            return F("32V 1A");
-        case Measure::C32V_2A:
-            return F("32V 2A");
-    }
-    return F("n/a");
-}
-
-void UserInterface::mainButtonTriggered() {
-    if (mode == Auto) {
-        mode = User;
-    }
-
-    lastUserInteraction = millis();
-    mainButtonWasTriggered = true;
-
-}
-
-
-
-void UserInterface::updateCalibration(const Measure::Calibration& calibration) {
-    currentCalibration = calibration;
-    resetModeToAuto();
-    screen = None;
-} 
-
 
