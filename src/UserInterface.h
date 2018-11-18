@@ -46,7 +46,7 @@ class UserInterface {
         void updateLastMeasurement(const Measurement& measurement);
         void buttonTriggered(Button button);
         void updateCalibration(const Measure::Calibration& calibration);
-        const String getCalibrationString() const;
+        const String getCalibrationString(const Measure::Calibration& calibration) const;
     private:
         enum Mode { ModeAuto, ModeUser, ModeMenu };
         enum Screen { None, Welcome, Voltage, Current, Power, Energy, EnergyTime, LastScr };
@@ -55,6 +55,7 @@ class UserInterface {
             Menu(Display& display): display(display) {}; 
             MenuItem displayedItemInMenu = Welcome;
             MenuItem displayedSubmenu = NoMenu;
+            byte submenuPosition = 0;
             Display& display;
             friend UserInterface::Menu::MenuItem& operator++(UserInterface::Menu::MenuItem& screen);
             friend UserInterface::Menu::MenuItem operator++(UserInterface::Menu::MenuItem& screen, int);
@@ -64,6 +65,9 @@ class UserInterface {
             void exitSubmenu();
             void renderSubmenu();
             void enterSubmenu();
+            void renderSubmenuCalibration();
+            void renderSubmenuInterval();
+            void renderSubmenuReset();
             friend UserInterface;
         };
         const unsigned long autoModeDelay = 2000;

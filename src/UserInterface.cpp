@@ -5,7 +5,7 @@
 void UserInterface::setup(const Measure::Calibration& calibration) {
   currentCalibration = calibration;
   display.setup();  
-  display.printHello(getCalibrationString());
+  display.printHello(getCalibrationString(currentCalibration));
   
 }
 
@@ -37,7 +37,7 @@ void UserInterface::loop() {
                             resetModeToAuto();
                             screen = Welcome;
                             renderScreen(screen);
-                        } else {
+                        } else if (menu.displayedSubmenu != Menu::Welcome && menu.displayedSubmenu != Menu::NoMenu) {
                             menu.enterSubmenu();
                         }
                     } else if (menu.displayedItemInMenu == Menu::Exit) {
@@ -78,17 +78,7 @@ void UserInterface::loop() {
     }
 }
 
-const String UserInterface::getCalibrationString() const {
-    switch(currentCalibration) {
-        case Measure::C16V_400:
-            return F("16V 400mA");
-        case Measure::C32V_1A:
-            return F("32V 1A");
-        case Measure::C32V_2A:
-            return F("32V 2A");
-    }
-    return F("n/a");
-}
+
 
 void UserInterface::updateCalibration(const Measure::Calibration& calibration) {
     currentCalibration = calibration;
@@ -101,9 +91,9 @@ void UserInterface::buttonTriggered(UserInterface::Button button) {
     processButtonOnNextLoop = button;
 }
 
-// PRIAVTE Menu
+// PRIVATE Menu
 
-
+//todo: make use of progmem
 //top level menu - string in promem
 // const char _top_menu_0[] PROGMEM = "";
 // const char _top_menu_1[] PROGMEM = "Menu";
@@ -114,13 +104,17 @@ void UserInterface::buttonTriggered(UserInterface::Button button) {
 // const char* const _top_menu_table[] PROGMEM = {_top_menu_0, _top_menu_1, _top_menu_2, _top_menu_3, _top_menu_4, _top_menu_5};
 
 
+const char _menu_exit[] = "Exit";
+
 const char _top_menu_0[] = "";
 const char _top_menu_1[] = "Menu";
 const char _top_menu_2[] = "Calibration";
 const char _top_menu_3[] = "Interval";
 const char _top_menu_4[] = "Reset energy";
-const char _top_menu_5[] = "Exit";
+const char* _top_menu_5 = _menu_exit;
 const char* const _top_menu_table[] = {_top_menu_0, _top_menu_1, _top_menu_2, _top_menu_3, _top_menu_4, _top_menu_5};
+
+
 
 
 void UserInterface::Menu::enterMenu() {
@@ -139,24 +133,57 @@ void UserInterface::Menu::scrollToNext() {
 
 void UserInterface::Menu::enterSubmenu() {
     displayedSubmenu = displayedItemInMenu;
+    submenuPosition = 0;
+    renderSubmenu();
 }
 
 void UserInterface::Menu::renderMenu() {
-    // static char firstLineBuffer[16];
-    // static char secondLineBuffer[16];
-
+    display.clear();
     if (displayedItemInMenu == Exit) {
-        display.clear();
         display.printMenuRow(0, false, _top_menu_table[4]);
         display.printMenuRow(1, true, _top_menu_table[5]);
     } else {
-        display.clear();
         display.printMenuRow(0, true, _top_menu_table[displayedItemInMenu]);
         display.printMenuRow(1, false, _top_menu_table[displayedItemInMenu + 1]);
     }
 }
 
 void UserInterface::Menu::renderSubmenu() {
+    switch(displayedSubmenu) {
+        case Menu::Calibration: 
+            renderSubmenuCalibration();
+            break;
+        case Menu::MeasurementInterval:
+            renderSubmenuInterval();
+            break;
+        case Menu::ResetEnergyMeasurement:
+            renderSubmenuReset();
+            break;
+        case Menu::NoMenu:
+        case Menu::Welcome:
+        case Menu::Exit:
+            //invalid
+            assert(true);
+            break;
+    }
+}
+
+void UserInterface::Menu::renderSubmenuCalibration() {
+    display.clear();
+//     if (submenuPosition == 3) {
+//         display.printMenuRow(0, false, getCalibrabtionString(getCalibration()));
+//         display.printMenuRow(1, true, _menu_exit);
+//     } else {
+//         display.printMenuRow(0, true, _top_menu_table[displayedItemInMenu]);
+//         display.printMenuRow(1, false, _top_menu_table[displayedItemInMenu + 1]);
+//     }
+}
+
+void UserInterface::Menu::renderSubmenuInterval() {
+
+}
+
+void UserInterface::Menu::renderSubmenuReset() {
 
 }
 
@@ -167,8 +194,6 @@ void UserInterface::Menu::exitSubmenu() {
 }
 
 // PRIVATE UserInterface
-
-
 
 
 UserInterface::Screen& operator++(UserInterface::Screen& screen)
@@ -223,7 +248,7 @@ void UserInterface::nextScreen() {
 void UserInterface::renderScreen(Screen scrToRender) {
     switch (scrToRender) {
         case Welcome: 
-            display.printHello(getCalibrationString());
+            display.printHello(getCalibrationString(currentCalibration));
             break;
         case Voltage:
             display.printValue(F("Voltage"), lastMeasurement.loadvoltage * 1000, F("mV"));
@@ -245,3 +270,13 @@ void UserInterface::renderScreen(Screen scrToRender) {
     }
 }
 
+const String UserInterface::getCalibrationString(const Measure::Calibration& calibration) const {
+    switch (calibration) {
+        case Measure::C16V_400 : return F("16V 400mA");
+        case Measure::C32V_1A : return F("32V 1A");
+        case Measure::C32V_2A : return F("32V 2A");
+        
+    }
+    return F("n/a");
+    
+}
