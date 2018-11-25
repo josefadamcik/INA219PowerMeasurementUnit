@@ -3,7 +3,7 @@
 #include "Measure.h"
 #include "Display.h"
 #include "UserInterface.h"
-
+#include "avr/interrupt.h"
 
 volatile Button buttonA(PIN3);
 volatile Button buttonB(PIN4);
@@ -12,12 +12,19 @@ Display lcd(0x27);
 UserInterface ui(lcd);
 Measurement lastMeasurement(0,0,0,0,0,0,0);
 
+
+
 void btn_interrupt_a() {
   buttonA.interrupt();
 }
 
 void btn_interrupt_b() {
   buttonB.interrupt();
+}
+
+ISR(PCINT0_vect) {
+    buttonA.interrupt();
+    buttonB.interrupt();
 }
 
 void setup(void) 
@@ -28,8 +35,13 @@ void setup(void)
   //     delay(1);
   // }
 
-  buttonA.setup(btn_interrupt_a);
-  buttonB.setup(btn_interrupt_b);
+  //interrupts on attiny85
+  GIMSK = 0b00100000;  // turns on pin change interrupts
+  PCMSK = 0b00011000;  // turn on interrupts on pins PB0, PB1, &amp;amp; PB4
+  sei();               // enables interrupts
+  
+  // buttonA.setup(btn_interrupt_a);
+  // buttonB.setup(btn_interrupt_b);
   measure.setup();
   ui.setup(measure.getCalibration());
 }

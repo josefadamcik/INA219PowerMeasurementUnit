@@ -10,11 +10,7 @@
 class Button {
     public:
         Button(int pin): pin(pin) {};
-        /**
-         * Pass a function for interrupt handling. The function should just call
-         * button.interrupt();
-         */ 
-        void setup(void (*userFunc)(void)) volatile;
+        void setup() volatile;
         void interrupt() volatile;
         bool checkIfButtonTriggeredAndReset() volatile;
         const int pin;
