@@ -245,25 +245,33 @@ void UserInterface::nextScreen() {
     }
 }
 
+const char str_voltage[] PROGMEM = "Voltage";
+const char str_current[] PROGMEM = "Current";
+const char str_power[] PROGMEM = "Power";
+const char str_energy[] PROGMEM = "Energy";
+const char str_energy_time[] PROGMEM = "Energy time";
+
 void UserInterface::renderScreen(Screen scrToRender) {
     switch (scrToRender) {
         case Welcome: 
             display.printHello(getCalibrationString(currentCalibration));
             break;
         case Voltage:
-            display.printValue("Voltage", lastMeasurement.loadvoltage * 1000, "mV");
+            display.printValue(str_voltage, lastMeasurement.loadvoltage * 1000,
+                               "mV");
             break;
         case Current:
-            display.printValue("Current", lastMeasurement.current_mA, "mA");
+            display.printValue(str_current, lastMeasurement.current_mA, "mA");
             break;
         case Power:
-            display.printValue("Power", lastMeasurement.power_mW, "mW");
+            display.printValue(str_power, lastMeasurement.power_mW, "mW");
             break;
         case Energy:
-            display.printValue("Energy", lastMeasurement.energy_mWh, "mWh");
+            display.printValue(str_energy, lastMeasurement.energy_mWh, "mWh");
             break;
         case EnergyTime:
-            display.printValue("Energy time", lastMeasurement.energyMillis / 1000, "s");
+            display.printValue(str_energy_time,
+                               lastMeasurement.energyMillis / 1000, "s");
             break;
         default:
             display.clear();   
