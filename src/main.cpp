@@ -1,24 +1,24 @@
 #include <Arduino.h>
-#include "Controlls.h"
+// #include "Controlls.h"
 #include "Measure.h"
-#include "Display.h"
-#include "UserInterface.h"
+// #include "Display.h"
+// #include "UserInterface.h"
 
 
-volatile Button buttonA(PIN3);
-volatile Button buttonB(PIN4);
+// volatile Button buttonA(PIN3);
+// volatile Button buttonB(PIN4);
 Measure measure(/*delay*/ 5000, Measure::C16V_400);
-Display lcd(0x27);
-UserInterface ui(lcd);
+// Display lcd(0x27);
+// UserInterface ui(lcd);
 Measurement lastMeasurement(0,0,0,0,0,0,0);
 
-void btn_interrupt_a() {
-  buttonA.interrupt();
-}
+// void btn_interrupt_a() {
+//   buttonA.interrupt();
+// }
 
-void btn_interrupt_b() {
-  buttonB.interrupt();
-}
+// void btn_interrupt_b() {
+//   buttonB.interrupt();
+// }
 
 void setup(void) 
 {
@@ -28,10 +28,10 @@ void setup(void)
   //     delay(1);
   // }
 
-  buttonA.setup(btn_interrupt_a);
-  buttonB.setup(btn_interrupt_b);
+  // buttonA.setup(btn_interrupt_a);
+  // buttonB.setup(btn_interrupt_b);
   measure.setup();
-  ui.setup(measure.getCalibration());
+  // ui.setup(measure.getCalibration());
 }
 
 void loop(void) 
@@ -48,19 +48,19 @@ void loop(void)
     // Serial.print(F("Energy interval: ")); Serial.print(lastMeasurement.energyMillis / 1000); Serial.println(F(" s"));
     // Serial.print(F("delta(Energy):   ")); Serial.print(lastMeasurement.energyDelta); Serial.println(F(" mWh"));
     // Serial.println();
-    ui.updateLastMeasurement(lastMeasurement);
+    // ui.updateLastMeasurement(lastMeasurement);
   }
 
-  if (buttonA.checkIfButtonTriggeredAndReset()) {
-    // Serial.println(F("Button A triggered"));
-    ui.buttonTriggered(UserInterface::Primary);
-  }
+  // if (buttonA.checkIfButtonTriggeredAndReset()) {
+  //   // Serial.println(F("Button A triggered"));
+  //   ui.buttonTriggered(UserInterface::Primary);
+  // }
 
-  if (buttonB.checkIfButtonTriggeredAndReset()) {
-    // Serial.println(F("Button B triggered"));
-    ui.buttonTriggered(UserInterface::Secondary);
-  }
+  // if (buttonB.checkIfButtonTriggeredAndReset()) {
+  //   // Serial.println(F("Button B triggered"));
+  //   ui.buttonTriggered(UserInterface::Secondary);
+  // }
 
 
-  ui.loop();
+  // ui.loop();
 }
