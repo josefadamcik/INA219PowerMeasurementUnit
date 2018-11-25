@@ -46,8 +46,10 @@ class UserInterface {
         void updateLastMeasurement(const Measurement& measurement);
         void buttonTriggered(Button button);
         void updateCalibration(const Measure::Calibration& calibration);
-        const String getCalibrationString(const Measure::Calibration& calibration) const;
-    private:
+        const char* getCalibrationString(
+            const Measure::Calibration& calibration) const;
+
+       private:
         enum Mode { ModeAuto, ModeUser, ModeMenu };
         enum Screen { None, Welcome, Voltage, Current, Power, Energy, EnergyTime, LastScr };
         class Menu {

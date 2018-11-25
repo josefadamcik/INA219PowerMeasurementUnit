@@ -8,7 +8,7 @@ void Display::setup() {
     lcd.createChar(0, arrow);
 }
 
-void Display::printHello(const String& secondRow) {
+void Display::printHello(const char* secondRow) {
     lcd.clear();
     lcd.home ();
     lcd.backlight();
@@ -21,13 +21,14 @@ void Display::clear() {
     lcd.clear();
 }
 
-void Display::printValue(const String& title, const float& number, const String& unit) {
+void Display::printValue(const char* title, const float& number,
+                         const char* unit) {
     clear();
     lcd.setCursor(0,0);
     lcd.print(title);
     lcd.setCursor(0,1);
     lcd.print(number);
-    lcd.setCursor(16 - unit.length(),1);
+    lcd.setCursor(16 - strlen(unit),1);
     lcd.print(unit);
 }
 

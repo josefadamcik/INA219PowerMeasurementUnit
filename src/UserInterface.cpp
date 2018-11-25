@@ -251,32 +251,33 @@ void UserInterface::renderScreen(Screen scrToRender) {
             display.printHello(getCalibrationString(currentCalibration));
             break;
         case Voltage:
-            display.printValue(F("Voltage"), lastMeasurement.loadvoltage * 1000, F("mV"));
+            display.printValue("Voltage", lastMeasurement.loadvoltage * 1000, "mV");
             break;
         case Current:
-            display.printValue(F("Current"), lastMeasurement.current_mA, F("mA"));
+            display.printValue("Current", lastMeasurement.current_mA, "mA");
             break;
         case Power:
-            display.printValue(F("Power"), lastMeasurement.power_mW, F("mW"));
+            display.printValue("Power", lastMeasurement.power_mW, "mW");
             break;
         case Energy:
-            display.printValue(F("Energy"), lastMeasurement.energy_mWh, F("mWh"));
+            display.printValue("Energy", lastMeasurement.energy_mWh, "mWh");
             break;
         case EnergyTime:
-            display.printValue(F("Energy time"), lastMeasurement.energyMillis / 1000, F("s"));
+            display.printValue("Energy time", lastMeasurement.energyMillis / 1000, "s");
             break;
         default:
             display.clear();   
     }
 }
 
-const String UserInterface::getCalibrationString(const Measure::Calibration& calibration) const {
+const char* UserInterface::getCalibrationString(
+    const Measure::Calibration& calibration) const {
     switch (calibration) {
-        case Measure::C16V_400 : return F("16V 400mA");
-        case Measure::C32V_1A : return F("32V 1A");
-        case Measure::C32V_2A : return F("32V 2A");
+        case Measure::C16V_400 : return "16V 400mA";
+        case Measure::C32V_1A : return "32V 1A";
+        case Measure::C32V_2A : return "32V 2A";
         
     }
-    return F("n/a");
+    return "n/a";
     
 }
