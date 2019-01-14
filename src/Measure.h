@@ -1,5 +1,5 @@
 #include <Arduino.h>
-// #include <Adafruit_INA219.h>
+#include <Adafruit_INA219.h>
 #include <assert.h>
 
 #ifndef INC_MEASURE
@@ -57,7 +57,7 @@ class Measure {
         unsigned long energyEstimateResetMillis = 0;
         float energyEstimate = 0;
         Measure(const Measure&);   //prevent copy constructor
-        // Adafruit_INA219 ina219;
+        Adafruit_INA219 ina219;
         void configureIna(const Measure::Calibration& cal);
 };
 
