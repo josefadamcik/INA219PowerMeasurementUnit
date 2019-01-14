@@ -18,13 +18,14 @@ Measure::Calibration operator++(Measure::Calibration& screen, int)
 
 
 void Measure::setup() {
-  ina219.begin();
+//   ina219.begin();
   configureIna(calibration);
 }
 
 
 const Measurement Measure::doNewMeasurement() {
-    float power_mW = ina219.getPower_mW();
+    // float power_mW = ina219.getPower_mW();
+    float power_mW = 0;  // todo: remove
     unsigned long now = millis();
     // Serial.print("now "); Serial.print(now); Serial.print(" last "); Serial.println(lastMeasurement);
     //compute estimated energy
@@ -39,9 +40,10 @@ const Measurement Measure::doNewMeasurement() {
     
     lastMeasurement = now;
     return Measurement(
-        ina219.getShuntVoltage_mV(),
-        ina219.getBusVoltage_V(),
-        ina219.getCurrent_mA(),
+        // ina219.getShuntVoltage_mV(),
+        // ina219.getBusVoltage_V(),
+        // ina219.getCurrent_mA(),
+        0,0,0,
         power_mW,
         energyEstimate,
         now - energyEstimateResetMillis,
@@ -71,13 +73,13 @@ Measure::Calibration Measure::getCalibration() const {
 void Measure::configureIna(const Measure::Calibration& cal) {
     switch (cal) {
         case Measure::C16V_400:
-            ina219.setCalibration_16V_400mA();
+            //ina219.setCalibration_16V_400mA();
             break;
         case Measure::C32V_1A:
-            ina219.setCalibration_32V_1A();
+            // ina219.setCalibration_32V_1A();
             break;
         case Measure::C32V_2A:
-            ina219.setCalibration_32V_2A();
+            // ina219.setCalibration_32V_2A();
             break;
     }
 }

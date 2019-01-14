@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <Adafruit_INA219.h>
+// #include <Adafruit_INA219.h>
 #include <assert.h>
 
 #ifndef INC_MEASURE
@@ -35,7 +35,7 @@ class Measure {
     public: 
         enum Calibration { C32V_2A, C32V_1A, C16V_400 };
         Measure(unsigned long interval, Calibration calibration): 
-            interval(interval), calibration(calibration), ina219()
+            interval(interval), calibration(calibration)//, ina219()
             {};
         void setup();
         /**
@@ -57,7 +57,7 @@ class Measure {
         unsigned long energyEstimateResetMillis = 0;
         float energyEstimate = 0;
         Measure(const Measure&);   //prevent copy constructor
-        Adafruit_INA219 ina219;
+        // Adafruit_INA219 ina219;
         void configureIna(const Measure::Calibration& cal);
 };
 
