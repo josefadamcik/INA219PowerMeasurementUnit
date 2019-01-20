@@ -15,7 +15,7 @@ class Button {
         bool checkIfButtonTriggeredAndReset() volatile;
         const int pin;
     private:
-        const unsigned long debounceTime = 150;
+        const unsigned long debounceTime = 200;
         volatile boolean debouncing = false;
         volatile int lastState = HIGH;
         volatile unsigned long changeDebounceStarted;

@@ -5,26 +5,38 @@
 #include "UserInterface.h"
 #include "avr/interrupt.h"
 
-volatile Button buttonA(PIN3);
-volatile Button buttonB(PIN4);
+volatile Button buttonA(PIN_B3);
+volatile Button buttonB(PIN_B4);
 Measure measure(/*delay*/ 5000, Measure::C16V_400);
 Display lcd(0x27);
 UserInterface ui(lcd);
 Measurement lastMeasurement(0,0,0,0,0,0,0);
 
-
-
-void btn_interrupt_a() {
-  buttonA.interrupt();
-}
-
-void btn_interrupt_b() {
-  buttonB.interrupt();
-}
+// const unsigned long debounceTime = 150;
+// volatile bool ledon = false;
+// volatile unsigned long btnChangeTime = 0;
+// volatile byte btnLastValue = HIGH;
+// volatile bool led2on = false;
+// // const byte ledpin = PIN_B4;88
+// // const byte btnpin = PIN_B3;
+// const byte btn2pin = PIN_B4;
 
 ISR(PCINT0_vect) {
     buttonA.interrupt();
     buttonB.interrupt();
+    // byte btnValue = digitalRead(btnpin);
+    // if (btnValue != btnLastValue) {
+    //     btnChangeTime = millis();
+    //     btnLastValue = btnValue;
+    // } else if (btnChangeTime > 0 && millis() - btnChangeTime >= debounceTime) {
+    //     if (btnValue == LOW) {
+    //         ledon = !ledon;
+    //     }
+    //     btnChangeTime = 0;
+    // }
+    // if (digitalRead(btn2pin) == LOW) {
+    //     led2on = !led2on;
+    // }
 }
 
 void setup(void) 
@@ -37,11 +49,14 @@ void setup(void)
 
   //interrupts on attiny85
   GIMSK = 0b00100000;  // turns on pin change interrupts
-  PCMSK = 0b00011000;  // turn on interrupts on pins PB0, PB1, &amp;amp; PB4
+  PCMSK = 0b00011000;  // turn on interrupts on pins PB3 and PB4
   sei();               // enables interrupts
-  
-  // buttonA.setup(btn_interrupt_a);
-  // buttonB.setup(btn_interrupt_b);
+
+  // pinMode(btnpin, INPUT_PULLUP);
+  // pinMode(btn2pin, INPUT_PULLUP);
+
+  buttonA.setup();
+  buttonB.setup();
   measure.setup();
   ui.setup(measure.getCalibration());
 }
@@ -65,14 +80,15 @@ void loop(void)
 
   if (buttonA.checkIfButtonTriggeredAndReset()) {
     // Serial.println(F("Button A triggered"));
-    ui.buttonTriggered(UserInterface::Primary);
+    // ui.buttonTriggered(UserInterface::Primary);
+    ui.ledon = !ui.ledon;
   }
 
   if (buttonB.checkIfButtonTriggeredAndReset()) {
     // Serial.println(F("Button B triggered"));
-    ui.buttonTriggered(UserInterface::Secondary);
+    // ui.buttonTriggered(UserInterface::Secondary);
+    ui.led2on = !ui.led2on;
   }
-
 
   ui.loop();
 }

@@ -14,68 +14,74 @@ void UserInterface::updateLastMeasurement(const Measurement& measurement) {
 }
 
 void UserInterface::loop() {
-    if (processButtonOnNextLoop != NoButton) {
-        switch (processButtonOnNextLoop) {
-            case UserInterface::Primary:
-                if (mode == ModeAuto) {
-                    mode = ModeUser;
-                    nextScreen();
-                    renderScreen(screen);
-                } else if (mode == ModeUser) {
-                    nextScreen();
-                    renderScreen(screen);
-                } else if (mode == ModeMenu) {
-                    menu.scrollToNext();
-                }
-                break;
-            case UserInterface::Secondary:
-                if (mode == ModeMenu) {
-                    //select the item
-                    if (menu.displayedSubmenu == Menu::NoMenu) {
-                        if (menu.displayedItemInMenu == Menu::Exit) {
-                            //we are exiting the menu
-                            resetModeToAuto();
-                            screen = Welcome;
-                            renderScreen(screen);
-                        } else if (menu.displayedSubmenu != Menu::Welcome && menu.displayedSubmenu != Menu::NoMenu) {
-                            menu.enterSubmenu();
-                        }
-                    } else if (menu.displayedItemInMenu == Menu::Exit) {
-                        menu.exitSubmenu();
-                    } else if (menu.displayedSubmenu == Menu::Calibration) {
-                        //todo: select calibration
-                        menu.exitSubmenu();
-                    } else if (menu.displayedSubmenu == Menu::MeasurementInterval) {
-                        //todo: select calibration
-                        menu.exitSubmenu();
-                    } else if (menu.displayedSubmenu == Menu::ResetEnergyMeasurement) {
-                        //todo: do reset
-                        menu.exitSubmenu();
-                    }
-                } else {
-                    mode = ModeMenu;
-                    menu.enterMenu();
-                }
-                break;
-            case NoButton:
-                //nop, shouldn't happen
-                break;
-        }
-        processButtonOnNextLoop = NoButton;
-    } else {
-        if (mode == ModeAuto) {
-            if (lastAutoChange == 0 || lastAutoChange + autoModeDelay <= millis()) {
-                lastAutoChange = millis();
-                nextScreen();
-                renderScreen(screen);
-            }
-        } else if (lastUserInteraction + autoUserModeReset <= millis()) {
-            //auto quit user mode -> reset to auto mode.
-            resetModeToAuto();
-            screen = Welcome;
-            renderScreen(screen);
-        }
-    }
+    display.lcd.setCursor(0, 1);
+    // // print the number of seconds since reset:
+    display.lcd.print(millis() / 1000);
+    display.lcd.print(" ");
+    display.lcd.print(ledon ? "on  " : "off ");
+    display.lcd.print(led2on ? "on  " : "off ");
+    // if (processButtonOnNextLoop != NoButton) {
+    //     switch (processButtonOnNextLoop) {
+    //         case UserInterface::Primary:
+    //             if (mode == ModeAuto) {
+    //                 mode = ModeUser;
+    //                 nextScreen();
+    //                 renderScreen(screen);
+    //             } else if (mode == ModeUser) {
+    //                 nextScreen();
+    //                 renderScreen(screen);
+    //             } else if (mode == ModeMenu) {
+    //                 menu.scrollToNext();
+    //             }
+    //             break;
+    //         case UserInterface::Secondary:
+    //             if (mode == ModeMenu) {
+    //                 //select the item
+    //                 if (menu.displayedSubmenu == Menu::NoMenu) {
+    //                     if (menu.displayedItemInMenu == Menu::Exit) {
+    //                         //we are exiting the menu
+    //                         resetModeToAuto();
+    //                         screen = Welcome;
+    //                         renderScreen(screen);
+    //                     } else if (menu.displayedSubmenu != Menu::Welcome && menu.displayedSubmenu != Menu::NoMenu) {
+    //                         menu.enterSubmenu();
+    //                     }
+    //                 } else if (menu.displayedItemInMenu == Menu::Exit) {
+    //                     menu.exitSubmenu();
+    //                 } else if (menu.displayedSubmenu == Menu::Calibration) {
+    //                     //todo: select calibration
+    //                     menu.exitSubmenu();
+    //                 } else if (menu.displayedSubmenu == Menu::MeasurementInterval) {
+    //                     //todo: select calibration
+    //                     menu.exitSubmenu();
+    //                 } else if (menu.displayedSubmenu == Menu::ResetEnergyMeasurement) {
+    //                     //todo: do reset
+    //                     menu.exitSubmenu();
+    //                 }
+    //             } else {
+    //                 mode = ModeMenu;
+    //                 menu.enterMenu();
+    //             }
+    //             break;
+    //         case NoButton:
+    //             //nop, shouldn't happen
+    //             break;
+    //     }
+    //     processButtonOnNextLoop = NoButton;
+    // } else {
+    //     if (mode == ModeAuto) {
+    //         if (lastAutoChange == 0 || lastAutoChange + autoModeDelay <= millis()) {
+    //             lastAutoChange = millis();
+    //             nextScreen();
+    //             renderScreen(screen);
+    //         }
+    //     } else if (lastUserInteraction + autoUserModeReset <= millis()) {
+    //         //auto quit user mode -> reset to auto mode.
+    //         resetModeToAuto();
+    //         screen = Welcome;
+    //         renderScreen(screen);
+    //     }
+    // }
 }
 
 

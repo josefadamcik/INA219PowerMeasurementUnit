@@ -15,8 +15,10 @@ class Display {
                         const char* unit);
         void printMenuRow(byte row, bool selected, const char* content);
         void clear();
-    private:
-        LiquidCrystal_I2C lcd;  
+        LiquidCrystal_I2C lcd;
+
+       private:
+
         // Prevent copying
         Display & operator = (const Display & other);
         Display(const Display & other);

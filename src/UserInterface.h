@@ -48,7 +48,8 @@ class UserInterface {
         void updateCalibration(const Measure::Calibration& calibration);
         const char* getCalibrationString(
             const Measure::Calibration& calibration) const;
-
+        bool ledon = false;
+        bool led2on = false;
        private:
         enum Mode { ModeAuto, ModeUser, ModeMenu };
         enum Screen { None, Welcome, Voltage, Current, Power, Energy, EnergyTime, LastScr };
