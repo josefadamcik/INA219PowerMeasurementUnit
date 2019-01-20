@@ -6,7 +6,6 @@ void UserInterface::setup(const Measure::Calibration& calibration) {
   currentCalibration = calibration;
   display.setup();  
   display.printHello(getCalibrationString(currentCalibration));
-  
 }
 
 void UserInterface::updateLastMeasurement(const Measurement& measurement) {
@@ -14,74 +13,68 @@ void UserInterface::updateLastMeasurement(const Measurement& measurement) {
 }
 
 void UserInterface::loop() {
-    display.lcd.setCursor(0, 1);
-    // // print the number of seconds since reset:
-    display.lcd.print(millis() / 1000);
-    display.lcd.print(" ");
-    display.lcd.print(ledon ? "on  " : "off ");
-    display.lcd.print(led2on ? "on  " : "off ");
-    // if (processButtonOnNextLoop != NoButton) {
-    //     switch (processButtonOnNextLoop) {
-    //         case UserInterface::Primary:
-    //             if (mode == ModeAuto) {
-    //                 mode = ModeUser;
-    //                 nextScreen();
-    //                 renderScreen(screen);
-    //             } else if (mode == ModeUser) {
-    //                 nextScreen();
-    //                 renderScreen(screen);
-    //             } else if (mode == ModeMenu) {
-    //                 menu.scrollToNext();
-    //             }
-    //             break;
-    //         case UserInterface::Secondary:
-    //             if (mode == ModeMenu) {
-    //                 //select the item
-    //                 if (menu.displayedSubmenu == Menu::NoMenu) {
-    //                     if (menu.displayedItemInMenu == Menu::Exit) {
-    //                         //we are exiting the menu
-    //                         resetModeToAuto();
-    //                         screen = Welcome;
-    //                         renderScreen(screen);
-    //                     } else if (menu.displayedSubmenu != Menu::Welcome && menu.displayedSubmenu != Menu::NoMenu) {
-    //                         menu.enterSubmenu();
-    //                     }
-    //                 } else if (menu.displayedItemInMenu == Menu::Exit) {
-    //                     menu.exitSubmenu();
-    //                 } else if (menu.displayedSubmenu == Menu::Calibration) {
-    //                     //todo: select calibration
-    //                     menu.exitSubmenu();
-    //                 } else if (menu.displayedSubmenu == Menu::MeasurementInterval) {
-    //                     //todo: select calibration
-    //                     menu.exitSubmenu();
-    //                 } else if (menu.displayedSubmenu == Menu::ResetEnergyMeasurement) {
-    //                     //todo: do reset
-    //                     menu.exitSubmenu();
-    //                 }
-    //             } else {
-    //                 mode = ModeMenu;
-    //                 menu.enterMenu();
-    //             }
-    //             break;
-    //         case NoButton:
-    //             //nop, shouldn't happen
-    //             break;
-    //     }
-    //     processButtonOnNextLoop = NoButton;
-    // } else {
-    //     if (mode == ModeAuto) {
-    //         if (lastAutoChange == 0 || lastAutoChange + autoModeDelay <= millis()) {
-    //             lastAutoChange = millis();
-    //             nextScreen();
-    //             renderScreen(screen);
-    //         }
-    //     } else if (lastUserInteraction + autoUserModeReset <= millis()) {
-    //         //auto quit user mode -> reset to auto mode.
-    //         resetModeToAuto();
-    //         screen = Welcome;
-    //         renderScreen(screen);
-    //     }
-    // }
+    if (processButtonOnNextLoop != NoButton) {
+        switch (processButtonOnNextLoop) {
+            case UserInterface::Primary:
+                if (mode == ModeAuto) {
+                    mode = ModeUser;
+                    nextScreen();
+                    renderScreen(screen);
+                } else if (mode == ModeUser) {
+                    nextScreen();
+                    renderScreen(screen);
+                } else if (mode == ModeMenu) {
+                    scrollToNext();
+                }
+                break;
+            case UserInterface::Secondary:
+                if (mode == ModeMenu) {
+                    //select the item
+                    if (displayedSubmenu == NoMenu) {
+                        if (displayedItemInMenu == Exit) {
+                            //we are exiting the menu
+                            resetModeToAuto();
+                            screen = Welcome;
+                            renderScreen(screen);
+                        } else if (displayedItemInMenu != WelcomeMenu &&
+                                   displayedItemInMenu != NoMenu) {
+                            enterSubmenu();
+                        }
+                    } else if (displayedSubmenu == Calibration) {
+                        if (submenuPosition == 3) {
+                            exitSubmenu();
+                        } else {
+                            //TODO: change calibration;
+                        }
+                    } else if (displayedSubmenu == MeasurementInterval) {
+                        exitSubmenu();
+                    } else if (displayedSubmenu == ResetEnergyMeasurement) {
+                        exitSubmenu();
+                    }
+                } else {
+                    mode = ModeMenu;
+                    enterMenu();
+                }
+                break;
+            case NoButton:
+                //nop, shouldn't happen
+                break;
+        }
+        processButtonOnNextLoop = NoButton;
+    } else {
+        if (mode == ModeAuto) {
+            if (lastAutoChange == 0 || lastAutoChange + autoModeDelay <= millis()) {
+                lastAutoChange = millis();
+                nextScreen();
+                renderScreen(screen);
+            }
+        } else if (lastUserInteraction + autoUserModeReset <= millis()) {
+            //auto quit user mode -> reset to auto mode.
+            resetModeToAuto();
+            screen = Welcome;
+            renderScreen(screen);
+        }
+    }
 }
 
 
@@ -111,7 +104,6 @@ void UserInterface::buttonTriggered(UserInterface::Button button) {
 
 
 const char _menu_exit[] = "Exit";
-
 const char _top_menu_0[] = "";
 const char _top_menu_1[] = "Menu";
 const char _top_menu_2[] = "Calibration";
@@ -120,30 +112,37 @@ const char _top_menu_4[] = "Reset energy";
 const char* _top_menu_5 = _menu_exit;
 const char* const _top_menu_table[] = {_top_menu_0, _top_menu_1, _top_menu_2, _top_menu_3, _top_menu_4, _top_menu_5};
 
-
-
-
-void UserInterface::Menu::enterMenu() {
-    displayedItemInMenu = Menu::Welcome;
+void UserInterface::enterMenu() {
+    displayedItemInMenu = WelcomeMenu;
     renderMenu();
 }
 
-void UserInterface::Menu::scrollToNext() {
-    if (displayedItemInMenu == Menu::Exit) {
-        displayedItemInMenu = Menu::Welcome;
+void UserInterface::scrollToNext() {
+    if (displayedSubmenu == NoMenu) {
+        if (displayedItemInMenu == Exit) {
+            displayedItemInMenu = WelcomeMenu;
+        } else {
+            displayedItemInMenu++;
+        }
+        renderMenu();
     } else {
-        displayedItemInMenu++;
+        submenuPosition++;
+        if (displayedSubmenu == Calibration && submenuPosition == 4) {
+            submenuPosition = 0;
+        }
+        //TODO: other sumbmenus
+        renderSubmenu();
     }
-    renderMenu();
+
 }
 
-void UserInterface::Menu::enterSubmenu() {
+void UserInterface::enterSubmenu() {
     displayedSubmenu = displayedItemInMenu;
     submenuPosition = 0;
     renderSubmenu();
 }
 
-void UserInterface::Menu::renderMenu() {
+void UserInterface::renderMenu() {
     display.clear();
     if (displayedItemInMenu == Exit) {
         display.printMenuRow(0, false, _top_menu_table[4]);
@@ -154,144 +153,147 @@ void UserInterface::Menu::renderMenu() {
     }
 }
 
-void UserInterface::Menu::renderSubmenu() {
+void UserInterface::renderSubmenu() {
     switch(displayedSubmenu) {
-        case Menu::Calibration: 
+        case Calibration: 
             renderSubmenuCalibration();
             break;
-        case Menu::MeasurementInterval:
+        case MeasurementInterval:
             renderSubmenuInterval();
             break;
-        case Menu::ResetEnergyMeasurement:
+        case ResetEnergyMeasurement:
             renderSubmenuReset();
             break;
-        case Menu::NoMenu:
-        case Menu::Welcome:
-        case Menu::Exit:
+        case NoMenu:
+        case Welcome:
+        case Exit:
             //invalid
-            assert(true);
             break;
     }
 }
 
-void UserInterface::Menu::renderSubmenuCalibration() {
+void UserInterface::renderSubmenuCalibration() {
     display.clear();
-//     if (submenuPosition == 3) {
-//         display.printMenuRow(0, false, getCalibrabtionString(getCalibration()));
-//         display.printMenuRow(1, true, _menu_exit);
-//     } else {
-//         display.printMenuRow(0, true, _top_menu_table[displayedItemInMenu]);
-//         display.printMenuRow(1, false, _top_menu_table[displayedItemInMenu + 1]);
-//     }
-}
-
-void UserInterface::Menu::renderSubmenuInterval() {
-
-}
-
-void UserInterface::Menu::renderSubmenuReset() {
-
-}
-
-void UserInterface::Menu::exitSubmenu() {
-    displayedItemInMenu = displayedSubmenu;
-    displayedSubmenu = NoMenu;
-    renderMenu();
-}
-
-// PRIVATE UserInterface
-
-
-UserInterface::Screen& operator++(UserInterface::Screen& screen)
-{
-    assert(screen != UserInterface::LastScr);
-    return screen = static_cast<UserInterface::Screen>( screen + 1 );
-}
-
-UserInterface::Screen operator++(UserInterface::Screen& screen, int)
-{
-  assert(screen != UserInterface::LastScr);
-  UserInterface::Screen tmp(screen);
-  ++screen;
-  return tmp;
-}
-
-UserInterface::Menu::MenuItem& operator++(UserInterface::Menu::MenuItem& screen)
-{
-    assert(screen != UserInterface::Menu::Exit);
-    return screen = static_cast<UserInterface::Menu::MenuItem>( screen + 1 );
-}
-
-UserInterface::Menu::MenuItem operator++(UserInterface::Menu::MenuItem& screen, int)
-{
-  assert(screen != UserInterface::Menu::Exit);
-  UserInterface::Menu::MenuItem tmp(screen);
-  ++screen;
-  return tmp;
-}
-
-void UserInterface::loopAuto() {
-}
-
-void UserInterface::loopUser() {
-}
-
-void UserInterface::resetModeToAuto() {
-    processButtonOnNextLoop = NoButton;
-    lastUserInteraction = 0;
-    lastAutoChange = 0;
-    mode = ModeAuto;
-}
-
-void UserInterface::nextScreen() {
-    if (screen == LastScr - 1) { //the last one
-        screen = Welcome;
-    } else {
-        screen++;
+    if (submenuPosition == 0) {
+        display.printMenuRow(0, true, getCalibrationString(Measure::C16V_400));
+        display.printMenuRow(1, false, getCalibrationString(Measure::C32V_1A));
+    } else if (submenuPosition == 1) {
+        display.printMenuRow(0, true, getCalibrationString(Measure::C32V_1A));
+        display.printMenuRow(1, false, getCalibrationString(Measure::C32V_2A));
+    } else if (submenuPosition == 2) {
+        display.printMenuRow(0, true, getCalibrationString(Measure::C32V_2A));
+        display.printMenuRow(1, false, _menu_exit);
+    } else if (submenuPosition == 3) {
+        display.printMenuRow(0, false, getCalibrationString(Measure::C32V_2A));
+        display.printMenuRow(1, true, _menu_exit);
     }
 }
 
-const char str_voltage[] PROGMEM = "Voltage";
-const char str_current[] PROGMEM = "Current";
-const char str_power[] PROGMEM = "Power";
-const char str_energy[] PROGMEM = "Energy";
-const char str_energy_time[] PROGMEM = "Energy time";
+    void UserInterface::renderSubmenuInterval() {}
 
-void UserInterface::renderScreen(Screen scrToRender) {
-    switch (scrToRender) {
-        case Welcome: 
-            display.printHello(getCalibrationString(currentCalibration));
-            break;
-        case Voltage:
-            display.printValue(str_voltage, lastMeasurement.loadvoltage * 1000,
-                               "mV");
-            break;
-        case Current:
-            display.printValue(str_current, lastMeasurement.current_mA, "mA");
-            break;
-        case Power:
-            display.printValue(str_power, lastMeasurement.power_mW, "mW");
-            break;
-        case Energy:
-            display.printValue(str_energy, lastMeasurement.energy_mWh, "mWh");
-            break;
-        case EnergyTime:
-            display.printValue(str_energy_time,
-                               lastMeasurement.energyMillis / 1000, "s");
-            break;
-        default:
-            display.clear();   
-    }
-}
+    void UserInterface::renderSubmenuReset() {}
 
-const char* UserInterface::getCalibrationString(
-    const Measure::Calibration& calibration) const {
-    switch (calibration) {
-        case Measure::C16V_400 : return "16V 400mA";
-        case Measure::C32V_1A : return "32V 1A";
-        case Measure::C32V_2A : return "32V 2A";
-        
+    void UserInterface::exitSubmenu() {
+        displayedItemInMenu = displayedSubmenu;
+        displayedSubmenu = NoMenu;
+        renderMenu();
     }
-    return "n/a";
-    
-}
+
+    // PRIVATE UserInterface
+
+    UserInterface::Screen& operator++(UserInterface::Screen& screen) {
+        assert(screen != UserInterface::LastScr);
+        return screen = static_cast<UserInterface::Screen>(screen + 1);
+    }
+
+    UserInterface::Screen operator++(UserInterface::Screen& screen, int) {
+        assert(screen != UserInterface::LastScr);
+        UserInterface::Screen tmp(screen);
+        ++screen;
+        return tmp;
+    }
+
+    UserInterface::MenuItem& operator++(UserInterface::MenuItem& screen) {
+        assert(screen != UserInterface::Exit);
+        return screen = static_cast<UserInterface::MenuItem>(screen + 1);
+    }
+
+    UserInterface::MenuItem operator++(UserInterface::MenuItem& screen, int) {
+        assert(screen != UserInterface::Exit);
+        UserInterface::MenuItem tmp(screen);
+        ++screen;
+        return tmp;
+    }
+
+    void UserInterface::loopAuto() {}
+
+    void UserInterface::loopUser() {}
+
+    void UserInterface::resetModeToAuto() {
+        processButtonOnNextLoop = NoButton;
+        lastUserInteraction = 0;
+        lastAutoChange = 0;
+        mode = ModeAuto;
+    }
+
+    void UserInterface::nextScreen() {
+        if (screen == LastScr - 1) {  // the last one
+            screen = Welcome;
+        } else {
+            screen++;
+        }
+    }
+
+    // const char str_voltage[] PROGMEM = "Voltage";
+    // const char str_current[] PROGMEM = "Current";
+    // const char str_power[] PROGMEM = "Power";
+    // const char str_energy[] PROGMEM = "Energy";
+    // const char str_energy_time[] PROGMEM = "Energy time";
+
+    const char str_voltage[] = "Voltage";
+    const char str_current[] = "Current";
+    const char str_power[] = "Power";
+    const char str_energy[] = "Energy";
+    const char str_energy_time[] = "Energy time";
+
+    void UserInterface::renderScreen(Screen scrToRender) {
+        switch (scrToRender) {
+            case Welcome:
+                display.printHello(getCalibrationString(currentCalibration));
+                break;
+            case Voltage:
+                display.printValue(str_voltage,
+                                   lastMeasurement.loadvoltage * 1000, "mV");
+                break;
+            case Current:
+                display.printValue(str_current, lastMeasurement.current_mA,
+                                   "mA");
+                break;
+            case Power:
+                display.printValue(str_power, lastMeasurement.power_mW, "mW");
+                break;
+            case Energy:
+                display.printValue(str_energy, lastMeasurement.energy_mWh,
+                                   "mWh");
+                break;
+            case EnergyTime:
+                display.printValue(str_energy_time,
+                                   lastMeasurement.energyMillis / 1000, "s");
+                break;
+            default:
+                display.clear();
+        }
+    }
+
+    const char* UserInterface::getCalibrationString(
+        const Measure::Calibration& calibration) const {
+        switch (calibration) {
+            case Measure::C16V_400:
+                return "16V 400mA";
+            case Measure::C32V_1A:
+                return "32V 1A";
+            case Measure::C32V_2A:
+                return "32V 2A";
+        }
+        return "n/a";
+    }

@@ -12,31 +12,9 @@ Display lcd(0x27);
 UserInterface ui(lcd);
 Measurement lastMeasurement(0,0,0,0,0,0,0);
 
-// const unsigned long debounceTime = 150;
-// volatile bool ledon = false;
-// volatile unsigned long btnChangeTime = 0;
-// volatile byte btnLastValue = HIGH;
-// volatile bool led2on = false;
-// // const byte ledpin = PIN_B4;88
-// // const byte btnpin = PIN_B3;
-// const byte btn2pin = PIN_B4;
-
 ISR(PCINT0_vect) {
     buttonA.interrupt();
     buttonB.interrupt();
-    // byte btnValue = digitalRead(btnpin);
-    // if (btnValue != btnLastValue) {
-    //     btnChangeTime = millis();
-    //     btnLastValue = btnValue;
-    // } else if (btnChangeTime > 0 && millis() - btnChangeTime >= debounceTime) {
-    //     if (btnValue == LOW) {
-    //         ledon = !ledon;
-    //     }
-    //     btnChangeTime = 0;
-    // }
-    // if (digitalRead(btn2pin) == LOW) {
-    //     led2on = !led2on;
-    // }
 }
 
 void setup(void) 
@@ -80,14 +58,12 @@ void loop(void)
 
   if (buttonA.checkIfButtonTriggeredAndReset()) {
     // Serial.println(F("Button A triggered"));
-    // ui.buttonTriggered(UserInterface::Primary);
-    ui.ledon = !ui.ledon;
+    ui.buttonTriggered(UserInterface::Primary);
   }
 
   if (buttonB.checkIfButtonTriggeredAndReset()) {
     // Serial.println(F("Button B triggered"));
-    // ui.buttonTriggered(UserInterface::Secondary);
-    ui.led2on = !ui.led2on;
+    ui.buttonTriggered(UserInterface::Secondary);
   }
 
   ui.loop();
