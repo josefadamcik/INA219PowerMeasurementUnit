@@ -5,6 +5,7 @@
 #ifndef INC_USERINTERFACE
 #define INC_USERINTERFACE
 
+enum Menu { MenuMain, MenuCalibration, MenuInterval, MenuResetEnergy };
 
 /**
  * We have 16x2 LCD display and 2 buttons (primay and secondary).
@@ -52,25 +53,14 @@ class UserInterface {
         bool led2on = false;
        private:
         enum Mode { ModeAuto, ModeUser, ModeMenu };
-        enum Menu { MenuMain, MenuCalibration, MenuInterval, MenuResetEnergy };
         enum Screen { None, Welcome, Voltage, Current, Power, Energy, EnergyTime, LastScr };
-        enum MenuItem { NoMenu, WelcomeMenu, Calibration, MeasurementInterval, ResetEnergyMeasurement, Exit};
-        MenuItem displayedItemInMenu = WelcomeMenu;
-        MenuItem displayedSubmenu = NoMenu;
         Menu currentMenu = MenuMain;
-        byte submenuPosition = 0;
+        int currentMenuPosition = -1;
         Display& display;
-        friend UserInterface::MenuItem& operator++(UserInterface::MenuItem& screen);
-        friend UserInterface::MenuItem operator++(UserInterface::MenuItem& screen, int);
-        void enterMenu();
-        void renderMenu();
-        void scrollToNext();
-        void exitSubmenu();
-        void renderSubmenu();
-        void enterSubmenu();
-        void renderSubmenuCalibration();
-        void renderSubmenuInterval();
-        void renderSubmenuReset();
+        void menuEnter();
+        void menuRender();
+        void menuNextCommand();
+        void menuExecuteAction();
         const unsigned long autoModeDelay = 2000;
         const unsigned long autoUserModeReset = 5000;
         unsigned long lastAutoChange = 0;
@@ -87,8 +77,6 @@ class UserInterface {
         void resetModeToAuto();
         friend UserInterface::Screen& operator++(UserInterface::Screen& screen);
         friend UserInterface::Screen operator++(UserInterface::Screen& screen, int);
-        friend UserInterface::MenuItem& operator++(UserInterface::MenuItem& screen);
-        friend UserInterface::MenuItem operator++(UserInterface::MenuItem& screen, int);
 };
 
 

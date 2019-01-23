@@ -32,7 +32,6 @@ void setup(void)
 
   // pinMode(btnpin, INPUT_PULLUP);
   // pinMode(btn2pin, INPUT_PULLUP);
-
   buttonA.setup();
   buttonB.setup();
   measure.setup();
