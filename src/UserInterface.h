@@ -52,10 +52,12 @@ class UserInterface {
         bool led2on = false;
        private:
         enum Mode { ModeAuto, ModeUser, ModeMenu };
+        enum Menu { MenuMain, MenuCalibration, MenuInterval, MenuResetEnergy };
         enum Screen { None, Welcome, Voltage, Current, Power, Energy, EnergyTime, LastScr };
         enum MenuItem { NoMenu, WelcomeMenu, Calibration, MeasurementInterval, ResetEnergyMeasurement, Exit};
         MenuItem displayedItemInMenu = WelcomeMenu;
         MenuItem displayedSubmenu = NoMenu;
+        Menu currentMenu = MenuMain;
         byte submenuPosition = 0;
         Display& display;
         friend UserInterface::MenuItem& operator++(UserInterface::MenuItem& screen);
