@@ -1,4 +1,12 @@
 #include "UserInterface.h"
+#include "MemoryFree.h"
+
+const char str_voltage[] = "Voltage";
+const char str_current[] = "Current";
+const char str_power[] = "Power";
+const char str_energy[] = "Energy";
+const char str_energy_time[] = "Energy time";
+const char str_memory[] = "Memory";
 
 enum MenuCommand {
     CommandExit,
@@ -16,37 +24,40 @@ enum MenuCommand {
 const uint8_t _menu_commands[][MAX_MENU_ITEMS] = {
     [MenuMain] = {CommandCalibration, CommandInterval, CommandResetEnergy, CommandExit},
     [MenuCalibration] = {CommandCalibration1, CommandCalibration2, CommandCalibration3, CommandExit},
-    [MenuInterval] = {CommandInterval1, CommandExit},
-    [MenuResetEnergy] = {CommandDoResetEnergy, CommandExit}
+    [MenuInterval] = {CommandInterval1, CommandExit, 0, 0},
+    [MenuResetEnergy] = {CommandDoResetEnergy, CommandExit, 0, 0}
 };
 
-const char _menu_exit[] = "Exit";
-const char _top_menu_0[] = "";
-const char _top_menu_1[] = "Menu";
-const char _top_menu_2[] = "Calibration";
-const char _top_menu_3[] = "Interval";
-const char _top_menu_4[] = "Reset energy";
-const char* _top_menu_5 = _menu_exit;
-const char* const _top_menu_table[] = {_top_menu_0, _top_menu_1, _top_menu_2,
-                                       _top_menu_3, _top_menu_4, _top_menu_5};
+const char str_c_exit[] = "Exit";
+const char str_c_calibration[] = "Calibration";
+const char str_c_interval[] = "Interval";
+const char str_c_reset_energy[] = "Reset energy";
+const char str_c_calibration1[] = "16V 400mA";
+const char str_c_calibration2[] = "32V 1A";
+const char str_c_calibration3[] = "32V 2A"; 
+const char str_c_interval1[] = "1s";
+const char str_c_do_reset[] = "Reset";
 
-const char* const _command_labels[] = {
-    [CommandExit] = "Exit",
-    [CommandCalibration] = "Calibration",
-    [CommandInterval] = "Interval",
-    [CommandResetEnergy] = "Reset energy",
-    [CommandCalibration1] = "16V 400mA",
-    [CommandCalibration2] = "32V 1A",
-    [CommandCalibration3] = "32V 2A",
-    [CommandInterval1] = "1s",
-    [CommandDoResetEnergy] = "Reset"
+const char* _command_labels[] = {
+    // [CommandExit] =
+    str_c_exit,
+    // [CommandCalibration] = 
+    // str_c_calibration,
+    // [CommandInterval] = 
+    // str_c_interval,
+    // [CommandResetEnergy] = 
+    // str_c_reset_energy,
+    // [CommandCalibration1] = 
+    // str_c_calibration1,
+    // [CommandCalibration2] = 
+    // str_c_calibration2,
+    // [CommandCalibration3] = 
+    // str_c_calibration3,
+    // [CommandInterval1] = 
+    // str_c_interval1,
+    // [CommandDoResetEnergy] = 
+    str_c_do_reset
 };
-
-const char str_voltage[] = "Voltage";
-const char str_current[] = "Current";
-const char str_power[] = "Power";
-const char str_energy[] = "Energy";
-const char str_energy_time[] = "Energy time";
 
 // PUBLIC
 
@@ -174,12 +185,19 @@ void UserInterface::menuEnter() {
 
 void UserInterface::menuRender() {
     display.clear();
-    int menuItemCount = 0;
-    for (int i = 0; i < MAX_MENU_ITEMS; i++) {
-        menuItemCount++;
-        if (_menu_commands[currentMenu][i] == static_cast<uint8_t>(CommandExit)) break;
-    }
+
+    // int menuItemCount = 0;
+    // for (int i = 0; i < MAX_MENU_ITEMS; i++) {
+    //     menuItemCount++;
+    //     if (_menu_commands[currentMenu][i] ==
+    //     static_cast<uint8_t>(CommandExit)) break;
+    // }
     uint8_t currentCommand = _menu_commands[currentMenu][currentMenuPosition];
+    // const char* label1 = _command_labels[currentCommand];
+    // // const char* label2 = _command_labels[currentCommand + 1];
+    // display.printMenuRow( 0, false, label1);
+    // display.printMenuRow(1, true,  "b");
+
     if ( currentCommand == static_cast<uint8_t>(CommandExit)) {
         display.printMenuRow(
             0, false,
@@ -233,6 +251,9 @@ void UserInterface::renderScreen(Screen scrToRender) {
     switch (scrToRender) {
         case Welcome:
             display.printHello(getCalibrationString(currentCalibration));
+            break;
+        case Memory:
+            display.printValue(str_memory, freeMemory(), "b");
             break;
         case Voltage:
             display.printValue(str_voltage,

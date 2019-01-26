@@ -53,7 +53,7 @@ class UserInterface {
         bool led2on = false;
        private:
         enum Mode { ModeAuto, ModeUser, ModeMenu };
-        enum Screen { None, Welcome, Voltage, Current, Power, Energy, EnergyTime, LastScr };
+        enum Screen { None, Welcome, Memory, Voltage, Current, Power, Energy, EnergyTime, LastScr };
         Menu currentMenu = MenuMain;
         int currentMenuPosition = -1;
         Display& display;

@@ -30,8 +30,6 @@ void setup(void)
   PCMSK = 0b00011000;  // turn on interrupts on pins PB3 and PB4
   sei();               // enables interrupts
 
-  // pinMode(btnpin, INPUT_PULLUP);
-  // pinMode(btn2pin, INPUT_PULLUP);
   buttonA.setup();
   buttonB.setup();
   measure.setup();
