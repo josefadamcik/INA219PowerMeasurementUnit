@@ -51,19 +51,19 @@ const char* const _command_labels[] PROGMEM = {
     // [CommandExit] =
     str_c_exit,
     // [CommandCalibration] =
-    // str_c_calibration,
+    str_c_calibration,
     // [CommandInterval] =
-    // str_c_interval,
+    str_c_interval,
     // [CommandResetEnergy] =
-    // str_c_reset_energy,
+    str_c_reset_energy,
     // [CommandCalibration1] =
-    // str_c_calibration1,
+    str_c_calibration1,
     // [CommandCalibration2] =
-    // str_c_calibration2,
+    str_c_calibration2,
     // [CommandCalibration3] =
-    // str_c_calibration3,
+    str_c_calibration3,
     // [CommandInterval1] =
-    // str_c_interval1,
+    str_c_interval1,
     // [CommandDoResetEnergy] =
     str_c_do_reset};
 
