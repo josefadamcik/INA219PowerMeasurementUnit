@@ -14,7 +14,13 @@ void Display::printHello(const char* secondRow) {
     lcd.backlight();
     lcd.print(F("Hello, INA219"));  
     lcd.setCursor(0,1);
-    lcd.print(secondRow);
+    printProgmem(secondRow);
+}
+
+void Display::printProgmem(const char* text) {
+    static char buffer[17];
+    strcpy_P(buffer, text);
+    lcd.print(buffer);
 }
 
 void Display::clear() {
@@ -25,11 +31,11 @@ void Display::printValue(const char* title, const float& number,
                          const char* unit) {
     clear();
     lcd.setCursor(0,0);
-    lcd.print(title);
+    printProgmem(title);
     lcd.setCursor(0,1);
     lcd.print(number);
-    lcd.setCursor(16 - strlen(unit),1);
-    lcd.print(unit);
+    lcd.setCursor(16 - strlen_P(unit),1);
+    printProgmem(unit);
 }
 
 
@@ -42,5 +48,5 @@ void Display::printMenuRow(byte row, bool selected, const char* content) {
     } else {
         lcd.print(F("  "));
     }
-    lcd.print(content);
+    printProgmem(content);
 }

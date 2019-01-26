@@ -1,12 +1,21 @@
 #include "UserInterface.h"
 #include "MemoryFree.h"
 
-const char str_voltage[] = "Voltage";
-const char str_current[] = "Current";
-const char str_power[] = "Power";
-const char str_energy[] = "Energy";
-const char str_energy_time[] = "Energy time";
-const char str_memory[] = "Memory";
+const char str_voltage[] PROGMEM = "Voltage";
+const char str_current[] PROGMEM = "Current";
+const char str_power[] PROGMEM = "Power";
+const char str_energy[] PROGMEM = "Energy";
+const char str_energy_time[] PROGMEM = "Energy time";
+const char str_memory[] PROGMEM = "Memory";
+
+const char unit_mv[] PROGMEM = "mV";
+const char unit_mw[] PROGMEM = "mW";
+const char unit_b[] PROGMEM = "b";
+const char unit_s[] PROGMEM = "s";
+const char unit_ma[] PROGMEM = "mA";
+const char unit_mwh[] PROGMEM = "mWh";
+
+const char str_na[] PROGMEM = "n/a";
 
 enum MenuCommand {
     CommandExit,
@@ -28,36 +37,35 @@ const uint8_t _menu_commands[][MAX_MENU_ITEMS] = {
     [MenuResetEnergy] = {CommandDoResetEnergy, CommandExit, 0, 0}
 };
 
-const char str_c_exit[] = "Exit";
-const char str_c_calibration[] = "Calibration";
-const char str_c_interval[] = "Interval";
-const char str_c_reset_energy[] = "Reset energy";
-const char str_c_calibration1[] = "16V 400mA";
-const char str_c_calibration2[] = "32V 1A";
-const char str_c_calibration3[] = "32V 2A"; 
-const char str_c_interval1[] = "1s";
-const char str_c_do_reset[] = "Reset";
+const char str_c_exit[] PROGMEM = "Exit";
+const char str_c_calibration[] PROGMEM = "Calibration";
+const char str_c_interval[] PROGMEM = "Interval";
+const char str_c_reset_energy[] PROGMEM = "Reset energy";
+const char str_c_calibration1[] PROGMEM = "16V 400mA";
+const char str_c_calibration2[] PROGMEM = "32V 1A";
+const char str_c_calibration3[] PROGMEM = "32V 2A";
+const char str_c_interval1[] PROGMEM = "1s";
+const char str_c_do_reset[] PROGMEM = "Reset";
 
-const char* _command_labels[] = {
+const char* const _command_labels[] PROGMEM = {
     // [CommandExit] =
     str_c_exit,
-    // [CommandCalibration] = 
+    // [CommandCalibration] =
     // str_c_calibration,
-    // [CommandInterval] = 
+    // [CommandInterval] =
     // str_c_interval,
-    // [CommandResetEnergy] = 
+    // [CommandResetEnergy] =
     // str_c_reset_energy,
-    // [CommandCalibration1] = 
+    // [CommandCalibration1] =
     // str_c_calibration1,
-    // [CommandCalibration2] = 
+    // [CommandCalibration2] =
     // str_c_calibration2,
-    // [CommandCalibration3] = 
+    // [CommandCalibration3] =
     // str_c_calibration3,
-    // [CommandInterval1] = 
+    // [CommandInterval1] =
     // str_c_interval1,
-    // [CommandDoResetEnergy] = 
-    str_c_do_reset
-};
+    // [CommandDoResetEnergy] =
+    str_c_do_reset};
 
 // PUBLIC
 
@@ -185,31 +193,30 @@ void UserInterface::menuEnter() {
 
 void UserInterface::menuRender() {
     display.clear();
-
-    // int menuItemCount = 0;
-    // for (int i = 0; i < MAX_MENU_ITEMS; i++) {
-    //     menuItemCount++;
-    //     if (_menu_commands[currentMenu][i] ==
-    //     static_cast<uint8_t>(CommandExit)) break;
-    // }
     uint8_t currentCommand = _menu_commands[currentMenu][currentMenuPosition];
-    // const char* label1 = _command_labels[currentCommand];
-    // // const char* label2 = _command_labels[currentCommand + 1];
-    // display.printMenuRow( 0, false, label1);
-    // display.printMenuRow(1, true,  "b");
+    const char* row1;
+    const char* row2;
 
     if ( currentCommand == static_cast<uint8_t>(CommandExit)) {
-        display.printMenuRow(
-            0, false,
-            _command_labels[_menu_commands[currentMenu][currentMenuPosition - 1]]);
-        display.printMenuRow(1, true, _command_labels[currentCommand]);
+        uint8_t previousCommand = _menu_commands[currentMenu][currentMenuPosition - 1];
+        row1 = (char*)pgm_read_word(&(_command_labels[previousCommand]));
+        row2 = (char*)pgm_read_word(&(_command_labels[currentCommand]));
+        // display.printMenuRow(0, false, _command_labels[]);
+        // display.printMenuRow(1, true, _command_labels[currentCommand]);
     } else {
-        display.printMenuRow(0, true, _command_labels[currentCommand]);
-        display.printMenuRow(
-            1, false,
-            _command_labels[_menu_commands[currentMenu]
-                                          [currentMenuPosition + 1]]);
+        uint8_t nextCommand = _menu_commands[currentMenu][currentMenuPosition + 1];
+        row1 = (char*)pgm_read_word(&(_command_labels[currentCommand]));
+        row2 = (char*)pgm_read_word(&(_command_labels[nextCommand]));
+        // display.printMenuRow(0, true, _command_labels[currentCommand]);
+        // display.printMenuRow(
+        //     1, false,
+        //     _command_labels[_menu_commands[currentMenu]
+        //                                   [currentMenuPosition + 1]]);
     }
+    display.printMenuRow(0, currentCommand != static_cast<uint8_t>(CommandExit),
+                         row1);
+    display.printMenuRow(1, currentCommand == static_cast<uint8_t>(CommandExit),
+                         row2);
 }
 
 
@@ -253,26 +260,26 @@ void UserInterface::renderScreen(Screen scrToRender) {
             display.printHello(getCalibrationString(currentCalibration));
             break;
         case Memory:
-            display.printValue(str_memory, freeMemory(), "b");
+            display.printValue(str_memory, freeMemory(), unit_b);
             break;
         case Voltage:
             display.printValue(str_voltage,
-                                lastMeasurement.loadvoltage * 1000, "mV");
+                                lastMeasurement.loadvoltage * 1000, unit_mv);
             break;
         case Current:
             display.printValue(str_current, lastMeasurement.current_mA,
-                                "mA");
+                                unit_ma);
             break;
         case Power:
-            display.printValue(str_power, lastMeasurement.power_mW, "mW");
+            display.printValue(str_power, lastMeasurement.power_mW, unit_mw);
             break;
         case Energy:
             display.printValue(str_energy, lastMeasurement.energy_mWh,
-                                "mWh");
+                                unit_mwh);
             break;
         case EnergyTime:
             display.printValue(str_energy_time,
-                                lastMeasurement.energyMillis / 1000, "s");
+                                lastMeasurement.energyMillis / 1000, unit_s);
             break;
         default:
             display.clear();
@@ -283,11 +290,11 @@ const char* UserInterface::getCalibrationString(
     const Measure::Calibration& calibration) const {
     switch (calibration) {
         case Measure::C16V_400:
-            return "16V 400mA";
+            return str_c_calibration1;
         case Measure::C32V_1A:
-            return "32V 1A";
+            return str_c_calibration2;
         case Measure::C32V_2A:
-            return "32V 2A";
+            return str_c_calibration3;
     }
-    return "n/a";
+    return str_na;
 }
