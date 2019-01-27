@@ -1,6 +1,9 @@
 #include "Measure.h"
 
 const unsigned long millisInHour = 3600000;
+// we need to correct millis, reported are rougly 2times more than it should be.
+// Maybe because we are runnning 16mhz.
+const unsigned long timeCorrection = 2; 
 
 Measure::Calibration& operator++(Measure::Calibration& screen)
 {
@@ -32,7 +35,8 @@ const Measurement Measure::doNewMeasurement() {
     //compute estimated energy
     //energy = power * time = delta(elergy) + power * delta(time); unit = mW * h = mWh
     //TODO: beware float arithmetics
-    float deltaEnergy = (power_mW * (now - max(lastMeasurement, energyEstimateResetMillis))) / (float)millisInHour ;
+    unsigned long deltaTime = (now - max(lastMeasurement, energyEstimateResetMillis)) / timeCorrection;
+    float deltaEnergy = (power_mW * deltaTime) / (float)millisInHour ;
     // Serial.println(power_mW * (now - lastMeasurement));
     // Serial.println((float)millisInHour);
     // Serial.println((power_mW * (now - lastMeasurement)) / (float)millisInHour);
@@ -46,7 +50,7 @@ const Measurement Measure::doNewMeasurement() {
         ina219.getCurrent_mA(),
         power_mW,
         energyEstimate,
-        now - energyEstimateResetMillis,
+        (now - energyEstimateResetMillis) / timeCorrection,
         deltaEnergy
     );
 }
