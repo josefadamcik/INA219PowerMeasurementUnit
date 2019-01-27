@@ -11,13 +11,15 @@ void Display::setup() {
 const char str_hello[] PROGMEM = "Hello, INA219";
 const char str_space[] PROGMEM = " ";
 
-void Display::printHello(const char* secondRow) {
+void Display::printHello(const char* calibration, const int interval) {
     lcd.clear();
     lcd.home ();
     lcd.backlight();
     printProgmem(str_hello);
     lcd.setCursor(0,1);
-    printProgmem(secondRow);
+    printProgmem(calibration);
+    printProgmem(str_space);
+    lcd.print(interval);
 }
 
 void Display::printProgmem(const char* text) {

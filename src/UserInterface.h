@@ -68,6 +68,7 @@ class UserInterface {
         Screen screen = None;
         Mode mode = ModeAuto; 
         Measurement lastMeasurement;
+        bool measurementUpdated = false;
         void nextScreen();
         void renderScreen(Screen scrToRender);
         void resetModeToAuto();

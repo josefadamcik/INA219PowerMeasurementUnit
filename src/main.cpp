@@ -7,7 +7,7 @@
 
 volatile Button buttonA(PIN_B3);
 volatile Button buttonB(PIN_B4);
-Measure measure(/*delay*/ 5000, Measure::C16V_400);
+Measure measure(/*delay*/2000 * timeCorrection, Measure::C16V_400);
 Display lcd(0x27);
 UserInterface ui(lcd);
 Measurement lastMeasurement(0,0,0,0,0,0,0);

@@ -11,7 +11,7 @@ class Display {
         Display(uint8_t addr): lcd(addr, 16, 2) {};
         void setup();
         /** secondRow is pointer to string in progmem*/
-        void printHello(const char* secondRow);
+        void printHello(const char* calibration, const int interval);
         /** title and unit are pointers to strings in progmem*/
         void printValue(const char* title, const float& number,
                         const char* unit);

@@ -1,9 +1,7 @@
 #include "Measure.h"
 
 const unsigned long millisInHour = 3600000;
-// we need to correct millis, reported are rougly 2times more than it should be.
-// Maybe because we are runnning 16mhz.
-const unsigned long timeCorrection = 2; 
+
 
 Measure::Calibration& operator++(Measure::Calibration& screen)
 {
@@ -26,6 +24,10 @@ void Measure::setup() {
 void Measure::setCalibration(const Measure::Calibration& cal) {
     calibration = cal;
     configureIna(calibration); 
+}
+
+void Measure::setInterval(const unsigned long newInterval) {
+     interval = newInterval * timeCorrection;
 }
 
 const Measurement Measure::doNewMeasurement() {

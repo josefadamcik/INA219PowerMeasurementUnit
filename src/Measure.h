@@ -53,8 +53,10 @@ class Measure {
         Calibration getCalibration() const;
         void resetEnergyEstimate();
         void setCalibration(const Measure::Calibration& cal);
-    private:
-        const unsigned long interval;
+        void setInterval(const unsigned long interval);
+        inline int getInterval() { return interval / timeCorrection;};
+    private: 
+        unsigned long interval;
         Calibration calibration;
         unsigned long lastMeasurement = 0;
         unsigned long energyEstimateResetMillis = 0;

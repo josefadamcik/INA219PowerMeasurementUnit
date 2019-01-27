@@ -1,7 +1,7 @@
 #include "UserInterface.h"
 #include "MemoryFree.h"
 
-#define MAX_MENU_ITEMS 4
+#define MAX_MENU_ITEMS 6
 
 const char str_voltage[] PROGMEM = "Voltage";
 const char str_current[] PROGMEM = "Current";
@@ -27,16 +27,19 @@ enum MenuCommand {
     CommandCalibration1,
     CommandCalibration2,
     CommandCalibration3,
-    CommandInterval1,
+    CommandInterval1,  // 0.5s
+    CommandInterval2,  // 1s
+    CommandInterval3,  // 2s
+    CommandInterval4,  // 5s
+    CommandInterval5,  // 10s
     CommandDoResetEnergy
 };
-
 
 const uint8_t _menu_commands[][MAX_MENU_ITEMS] = {
     [MenuMain] = {CommandCalibration, CommandInterval, CommandResetEnergy, CommandExit},
     [MenuCalibration] = {CommandCalibration1, CommandCalibration2, CommandCalibration3, CommandExit},
-    [MenuInterval] = {CommandInterval1, CommandExit, 0, 0},
-    [MenuResetEnergy] = {CommandDoResetEnergy, CommandExit, 0, 0}
+    [MenuInterval] = {CommandInterval1, CommandInterval2, CommandInterval3, CommandInterval4, CommandInterval5, CommandExit},
+    [MenuResetEnergy] = {CommandDoResetEnergy, CommandExit}
 };
 
 const char str_c_exit[] PROGMEM = "Exit";
@@ -46,7 +49,11 @@ const char str_c_reset_energy[] PROGMEM = "Reset energy";
 const char str_c_calibration1[] PROGMEM = "16V 400mA";
 const char str_c_calibration2[] PROGMEM = "32V 1A";
 const char str_c_calibration3[] PROGMEM = "32V 2A";
-const char str_c_interval1[] PROGMEM = "1s";
+const char str_c_interval1[] PROGMEM = "500 ms";
+const char str_c_interval2[] PROGMEM = "  1 s";
+const char str_c_interval3[] PROGMEM = "  2 s";
+const char str_c_interval4[] PROGMEM = "  5 s";
+const char str_c_interval5[] PROGMEM = " 10 s";
 const char str_c_do_reset[] PROGMEM = "Reset";
 
 const char* const _command_labels[] PROGMEM = {
@@ -66,19 +73,22 @@ const char* const _command_labels[] PROGMEM = {
     str_c_calibration3,
     // [CommandInterval1] =
     str_c_interval1,
+    str_c_interval2,
+    str_c_interval3,
+    str_c_interval4,
+    str_c_interval5,
     // [CommandDoResetEnergy] =
     str_c_do_reset};
-
-// PUBLIC
 
 void UserInterface::setup(Measure* m) {
     measure = m;
     display.setup();
-    display.printHello(getCalibrationString(measure->getCalibration()));
+    display.printHello(getCalibrationString(measure->getCalibration()), measure->getInterval());
 }
 
 void UserInterface::updateLastMeasurement(const Measurement& measurement) {
     lastMeasurement = measurement;
+    measurementUpdated = true;
 }
 
 void UserInterface::loop() {
@@ -116,11 +126,15 @@ void UserInterface::loop() {
                 lastAutoChange = millis();
                 nextScreen();
                 renderScreen(screen);
+            } else if (measurementUpdated) {
+                renderScreen(screen);
             }
         } else if (lastUserInteraction + autoUserModeReset <= millis()) {
             // auto quit user mode -> reset to auto mode.
             resetModeToAuto();
             screen = Welcome;
+            renderScreen(screen);
+        } else if (mode != ModeMenu && measurementUpdated) {
             renderScreen(screen);
         }
     }
@@ -130,8 +144,6 @@ void UserInterface::buttonTriggered(UserInterface::Button button) {
     lastUserInteraction = millis();
     processButtonOnNextLoop = button;
 }
-
-// PRIVATE Menu
 
 void UserInterface::menuExecuteAction() {
     uint8_t currentCommand = _menu_commands[currentMenu][currentMenuPosition];
@@ -159,6 +171,31 @@ void UserInterface::menuExecuteAction() {
             lastTopMenuPosition = currentMenuPosition;
             currentMenuPosition = 0;
             menuRender();
+            break;
+        case CommandInterval1:
+            measure->setInterval(500);
+            resetModeToAuto();
+            nextScreen();
+            break;
+        case CommandInterval2:
+            measure->setInterval(1000);
+            resetModeToAuto();
+            nextScreen();
+            break;
+        case CommandInterval3:
+            measure->setInterval(2000);
+            resetModeToAuto();
+            nextScreen();
+            break;
+        case CommandInterval4:
+            measure->setInterval(5000);
+            resetModeToAuto();
+            nextScreen();
+            break;
+        case CommandInterval5:
+            measure->setInterval(10000);
+            resetModeToAuto();
+            nextScreen();
             break;
         case CommandResetEnergy:
             currentMenu = MenuResetEnergy;
@@ -262,10 +299,13 @@ void UserInterface::nextScreen() {
 }
 
 void UserInterface::renderScreen(Screen scrToRender) {
-    
+    measurementUpdated = false;
     switch (scrToRender) {
         case Welcome:
-            display.printHello(getCalibrationString(measure->getCalibration()));
+            display.printHello(
+                getCalibrationString(measure->getCalibration()),
+                measure->getInterval()
+                );
             break;
         case Memory:
             display.printValue(str_memory, freeMemory(), unit_b);
