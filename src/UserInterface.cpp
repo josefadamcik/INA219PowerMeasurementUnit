@@ -1,6 +1,8 @@
 #include "UserInterface.h"
 #include "MemoryFree.h"
 
+#define MAX_MENU_ITEMS 4
+
 const char str_voltage[] PROGMEM = "Voltage";
 const char str_current[] PROGMEM = "Current";
 const char str_power[] PROGMEM = "Power";
@@ -28,7 +30,7 @@ enum MenuCommand {
     CommandInterval1,
     CommandDoResetEnergy
 };
-#define MAX_MENU_ITEMS 4
+
 
 const uint8_t _menu_commands[][MAX_MENU_ITEMS] = {
     [MenuMain] = {CommandCalibration, CommandInterval, CommandResetEnergy, CommandExit},
@@ -124,7 +126,6 @@ void UserInterface::loop() {
     }
 }
 
-
 void UserInterface::updateCalibration(
     const Measure::Calibration& calibration) {
     currentCalibration = calibration;
@@ -201,17 +202,10 @@ void UserInterface::menuRender() {
         uint8_t previousCommand = _menu_commands[currentMenu][currentMenuPosition - 1];
         row1 = (char*)pgm_read_word(&(_command_labels[previousCommand]));
         row2 = (char*)pgm_read_word(&(_command_labels[currentCommand]));
-        // display.printMenuRow(0, false, _command_labels[]);
-        // display.printMenuRow(1, true, _command_labels[currentCommand]);
     } else {
         uint8_t nextCommand = _menu_commands[currentMenu][currentMenuPosition + 1];
         row1 = (char*)pgm_read_word(&(_command_labels[currentCommand]));
         row2 = (char*)pgm_read_word(&(_command_labels[nextCommand]));
-        // display.printMenuRow(0, true, _command_labels[currentCommand]);
-        // display.printMenuRow(
-        //     1, false,
-        //     _command_labels[_menu_commands[currentMenu]
-        //                                   [currentMenuPosition + 1]]);
     }
     display.printMenuRow(0, currentCommand != static_cast<uint8_t>(CommandExit),
                          row1);

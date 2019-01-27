@@ -8,11 +8,14 @@ void Display::setup() {
     lcd.createChar(0, arrow);
 }
 
+const char str_hello[] PROGMEM = "Hello, INA219";
+const char str_space[] PROGMEM = " ";
+
 void Display::printHello(const char* secondRow) {
     lcd.clear();
     lcd.home ();
     lcd.backlight();
-    lcd.print(F("Hello, INA219"));  
+    printProgmem(str_hello);
     lcd.setCursor(0,1);
     printProgmem(secondRow);
 }
@@ -44,9 +47,10 @@ void Display::printMenuRow(byte row, bool selected, const char* content) {
     lcd.setCursor(0, row);
     if (selected) {
         lcd.write(0);
-        lcd.print(F(" "));
+        printProgmem(str_space);
     } else {
-        lcd.print(F("  "));
+        printProgmem(str_space);
+        printProgmem(str_space);
     }
     printProgmem(content);
 }
