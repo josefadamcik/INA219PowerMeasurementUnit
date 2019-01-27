@@ -60,8 +60,8 @@ class UserInterface {
         void menuRender();
         void menuNextCommand();
         void menuExecuteAction();
-        const unsigned long autoModeDelay = 2000;
-        const unsigned long autoUserModeReset = 5000;
+        const unsigned long autoModeDelay = 3000 * timeCorrection;
+        const unsigned long autoUserModeReset = 10000 * timeCorrection;
         unsigned long lastAutoChange = 0;
         unsigned long lastUserInteraction = 0;
         Button processButtonOnNextLoop = NoButton;

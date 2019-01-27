@@ -5,6 +5,9 @@
 #ifndef INC_MEASURE
 #define INC_MEASURE
 
+// we need to correct millis, reported are rougly 2times more than it should be.
+// Maybe because we are runnning 16mhz.
+const unsigned long timeCorrection = 2;
 
 class Measurement {
     public:
