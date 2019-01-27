@@ -1,23 +1,18 @@
 # Simple firmware for INA219 measurement unit with Arduino and LCD
 
-
 - INA219 breakout, i2c
 - 16x2 LCD, i2c
-- 2buttons
+- 2 buttons
+- controlled by attiny85
 
-Work in progress.
+Uses PlatformIO as build platform.
 
-Uses PlatformIO.
+## Notes:
 
-## TODO
-
-- [ ] smart backlight controll with timeouts
-- [ ] switch sensitivity modes (INA219 has three modes)
-- [ ] estimate consumed, controlls for reset
-- [ ] schematic
-- [ ] use attiny85 or maybe esp8266 (ability to log data via wifi)
-
+- Uses TinyWire as i2c implementation. There are modified libraries for INA219 and LCD communicatin included in the repository since they had to be modified in order to work with TinyWire.
+- Attiny85 should be using 16Mhz internal oscillator
 
 ## License
 
-MIT, see [LICENSE](LICENSE)
+MIT, see [LICENSE](LICENSE).
+This repository also contains modified copies and libraries (see lib directory) which have their own licences.
