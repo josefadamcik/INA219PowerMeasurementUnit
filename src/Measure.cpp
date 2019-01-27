@@ -16,12 +16,14 @@ Measure::Calibration operator++(Measure::Calibration& screen, int)
   return tmp;
 }
 
-
 void Measure::setup() {
-//   ina219.begin();
   configureIna(calibration);
 }
 
+void Measure::setCalibration(const Measure::Calibration& cal) {
+    calibration = cal;
+    configureIna(calibration); 
+}
 
 const Measurement Measure::doNewMeasurement() {
     float power_mW = ina219.getPower_mW();
@@ -53,16 +55,6 @@ bool Measure::didIntervalElapsed() const {
     return lastMeasurement == 0 ||  millis() >= lastMeasurement + interval;
 }
 
-
-Measure::Calibration Measure::nextCalibration() {
-    if (calibration == C16V_400) {
-        calibration = C32V_2A;
-    } else {
-        calibration++;
-    }
-    configureIna(calibration);
-    return calibration;
-}
 
 Measure::Calibration Measure::getCalibration() const {
     return calibration;

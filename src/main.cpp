@@ -33,7 +33,7 @@ void setup(void)
   buttonA.setup();
   buttonB.setup();
   measure.setup();
-  ui.setup(measure.getCalibration());
+  ui.setup(&measure);
 }
 
 void loop(void) 

@@ -47,9 +47,9 @@ class Measure {
          * Does the measurement and resets the last measurement time.
          */
         const Measurement doNewMeasurement();
-        Calibration nextCalibration();
         Calibration getCalibration() const;
         void resetEnergyEstimate();
+        void setCalibration(const Measure::Calibration& cal);
     private:
         const unsigned long interval;
         Calibration calibration;

@@ -42,19 +42,20 @@ class UserInterface {
     public:
         enum Button { Primary, Secondary, NoButton };
         UserInterface(Display& display): display(display),  lastMeasurement(0,0,0,0,0,0,0)  {};
-        void setup(const Measure::Calibration& calibration);
+        void setup(Measure* measure);
         void loop();
         void updateLastMeasurement(const Measurement& measurement);
         void buttonTriggered(Button button);
-        void updateCalibration(const Measure::Calibration& calibration);
         const char* getCalibrationString(
-            const Measure::Calibration& calibration) const;
+            const Measure::Calibration calibration) const;
        private:
         enum Mode { ModeAuto, ModeUser, ModeMenu };
         enum Screen { None, Welcome, Memory,  Voltage, Current, Power, Energy, EnergyTime, LastScr };
         Menu currentMenu = MenuMain;
         int currentMenuPosition = -1;
+        int lastTopMenuPosition = -2;
         Display& display;
+        Measure* measure;
         void menuEnter();
         void menuRender();
         void menuNextCommand();
@@ -63,13 +64,10 @@ class UserInterface {
         const unsigned long autoUserModeReset = 5000;
         unsigned long lastAutoChange = 0;
         unsigned long lastUserInteraction = 0;
-        Measure::Calibration currentCalibration = Measure::C16V_400;
         Button processButtonOnNextLoop = NoButton;
         Screen screen = None;
         Mode mode = ModeAuto; 
         Measurement lastMeasurement;
-        void loopAuto();
-        void loopUser();
         void nextScreen();
         void renderScreen(Screen scrToRender);
         void resetModeToAuto();

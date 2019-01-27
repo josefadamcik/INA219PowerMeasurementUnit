@@ -71,10 +71,10 @@ const char* const _command_labels[] PROGMEM = {
 
 // PUBLIC
 
-void UserInterface::setup(const Measure::Calibration& calibration) {
-    currentCalibration = calibration;
+void UserInterface::setup(Measure* m) {
+    measure = m;
     display.setup();
-    display.printHello(getCalibrationString(currentCalibration));
+    display.printHello(getCalibrationString(measure->getCalibration()));
 }
 
 void UserInterface::updateLastMeasurement(const Measurement& measurement) {
@@ -126,13 +126,6 @@ void UserInterface::loop() {
     }
 }
 
-void UserInterface::updateCalibration(
-    const Measure::Calibration& calibration) {
-    currentCalibration = calibration;
-    resetModeToAuto();
-    screen = None;
-}
-
 void UserInterface::buttonTriggered(UserInterface::Button button) {
     lastUserInteraction = millis();
     processButtonOnNextLoop = button;
@@ -147,29 +140,51 @@ void UserInterface::menuExecuteAction() {
     {
         case CommandExit:
             if (currentMenu == MenuMain) {
-                currentMenuPosition = -1;
                 resetModeToAuto();
                 nextScreen();
             } else { //submenu
                 currentMenu = MenuMain;
-                currentMenuPosition = 0; 
+                currentMenuPosition = lastTopMenuPosition; 
                 menuRender();
             }
             break;
         case CommandCalibration:
             currentMenu = MenuCalibration;
+            lastTopMenuPosition = currentMenuPosition;
             currentMenuPosition = 0;
             menuRender();
             break;
         case CommandInterval:
             currentMenu = MenuInterval;
+            lastTopMenuPosition = currentMenuPosition;
             currentMenuPosition = 0;
             menuRender();
             break;
         case CommandResetEnergy:
             currentMenu = MenuResetEnergy;
+            lastTopMenuPosition = currentMenuPosition;
             currentMenuPosition = 0;
             menuRender();
+            break;
+        case CommandDoResetEnergy:
+            measure->resetEnergyEstimate();
+            resetModeToAuto();
+            nextScreen();
+            break;
+        case CommandCalibration1:
+            measure->setCalibration(Measure::C16V_400);
+            resetModeToAuto();
+            nextScreen();
+            break;
+        case CommandCalibration2:
+            measure->setCalibration(Measure::C32V_1A);
+            resetModeToAuto();
+            nextScreen();
+            break;
+        case CommandCalibration3:
+            measure->setCalibration(Measure::C32V_2A);
+            resetModeToAuto();
+            nextScreen();
             break;
         default:
             break;
@@ -229,12 +244,10 @@ UserInterface::Screen operator++(UserInterface::Screen& screen, int) {
 }
 
 
-void UserInterface::loopAuto() {}
-
-void UserInterface::loopUser() {}
-
 void UserInterface::resetModeToAuto() {
     processButtonOnNextLoop = NoButton;
+    currentMenuPosition = -1;
+    lastTopMenuPosition = -1;
     lastUserInteraction = 0;
     lastAutoChange = 0;
     mode = ModeAuto;
@@ -249,9 +262,10 @@ void UserInterface::nextScreen() {
 }
 
 void UserInterface::renderScreen(Screen scrToRender) {
+    
     switch (scrToRender) {
         case Welcome:
-            display.printHello(getCalibrationString(currentCalibration));
+            display.printHello(getCalibrationString(measure->getCalibration()));
             break;
         case Memory:
             display.printValue(str_memory, freeMemory(), unit_b);
@@ -281,7 +295,7 @@ void UserInterface::renderScreen(Screen scrToRender) {
 }
 
 const char* UserInterface::getCalibrationString(
-    const Measure::Calibration& calibration) const {
+    const Measure::Calibration calibration) const {
     switch (calibration) {
         case Measure::C16V_400:
             return str_c_calibration1;
