@@ -93,30 +93,35 @@ void UserInterface::updateLastMeasurement(const Measurement& measurement) {
 
 void UserInterface::loop() {
     if (processButtonOnNextLoop != NoButton) {
-        switch (processButtonOnNextLoop) {
-            case UserInterface::Primary:
-                if (mode == ModeAuto) {
-                    mode = ModeUser;
-                    nextScreen();
-                    renderScreen(screen);
-                } else if (mode == ModeUser) {
-                    nextScreen();
-                    renderScreen(screen);
-                } else if (mode == ModeMenu) {
-                    menuNextCommand();
-                }
-                break;
-            case UserInterface::Secondary:
-                if (mode == ModeMenu) {
-                    menuExecuteAction();
-                } else {
-                    mode = ModeMenu;
-                    menuEnter();
-                }
-                break;
-            case NoButton:
-                // nop, shouldn't happen
-                break;
+        if (!backlight) {
+            display.backlightOn();
+            backlight = true;
+        } else {
+            switch (processButtonOnNextLoop) {
+                case UserInterface::Primary:
+                    if (mode == ModeAuto) {
+                        mode = ModeUser;
+                        nextScreen();
+                        renderScreen(screen);
+                    } else if (mode == ModeUser) {
+                        nextScreen();
+                        renderScreen(screen);
+                    } else if (mode == ModeMenu) {
+                        menuNextCommand();
+                    }
+                    break;
+                case UserInterface::Secondary:
+                    if (mode == ModeMenu) {
+                        menuExecuteAction();
+                    } else {
+                        mode = ModeMenu;
+                        menuEnter();
+                    }
+                    break;
+                case NoButton:
+                    // nop, shouldn't happen
+                    break;
+            }
         }
         processButtonOnNextLoop = NoButton;
     } else {
@@ -137,6 +142,11 @@ void UserInterface::loop() {
         } else if (mode != ModeMenu && measurementUpdated) {
             renderScreen(screen);
         }
+    }
+
+    if (lastUserInteraction + backlightTimeout <= millis()) {
+        display.backlightOff();
+        backlight = false;
     }
 }
 

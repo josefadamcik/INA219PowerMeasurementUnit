@@ -19,6 +19,8 @@ class Display {
         /** str pointer here is string in progmem*/
         void printProgmem(const char* text);
         void clear();
+        void backlightOn();
+        void backlightOff();
         LiquidCrystal_I2C lcd;
 
        private:

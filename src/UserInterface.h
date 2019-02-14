@@ -62,8 +62,10 @@ class UserInterface {
         void menuExecuteAction();
         const unsigned long autoModeDelay = 3000 * timeCorrection;
         const unsigned long autoUserModeReset = 10000 * timeCorrection;
+        const unsigned long backlightTimeout = 5000 * timeCorrection; 
         unsigned long lastAutoChange = 0;
         unsigned long lastUserInteraction = 0;
+        bool backlight = true;
         Button processButtonOnNextLoop = NoButton;
         Screen screen = None;
         Mode mode = ModeAuto; 
