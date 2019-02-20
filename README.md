@@ -11,6 +11,7 @@ Uses PlatformIO as build platform.
 
 - Uses TinyWire as i2c implementation. There are modified libraries for INA219 and LCD communicatin included in the repository since they had to be modified in order to work with TinyWire.
 - Attiny85 should be using 16Mhz internal oscillator
+-More informatio [can be found in a blog post](https://thewanderingengineer.com/2014/08/11/pin-change-interrupts-on-attiny85/), [schematic is available on EasyEDA](https://easyeda.com/josefadamcik/ina219measurementunit).
 
 ## License
 
