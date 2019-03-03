@@ -21,6 +21,14 @@ void Measure::setup() {
   configureIna(calibration);
 }
 
+void Measure::setup(uint16_t interval, uint8_t calibrationIndex) {
+    setInterval(interval);
+    if (calibrationIndex > 2) {
+        calibrationIndex = 0;
+    }
+    setCalibration(static_cast<Calibration>(calibrationIndex));
+}
+
 void Measure::setCalibration(const Measure::Calibration& cal) {
     calibration = cal;
     configureIna(calibration); 

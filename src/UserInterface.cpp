@@ -27,9 +27,9 @@ enum MenuCommand {
     CommandCalibration1,
     CommandCalibration2,
     CommandCalibration3,
-    CommandInterval1,  // 0.5s
-    CommandInterval2,  // 1s
-    CommandInterval3,  // 2s
+    CommandInterval1,  // 0.05s
+    CommandInterval2,  // 0.5s
+    CommandInterval3,  // 1s
     CommandInterval4,  // 5s
     CommandInterval5,  // 10s
     CommandDoResetEnergy
@@ -49,12 +49,13 @@ const char str_c_reset_energy[] PROGMEM = "Reset energy";
 const char str_c_calibration1[] PROGMEM = "16V 400mA";
 const char str_c_calibration2[] PROGMEM = "32V 1A";
 const char str_c_calibration3[] PROGMEM = "32V 2A";
-const char str_c_interval1[] PROGMEM = "500 ms";
-const char str_c_interval2[] PROGMEM = "  1 s";
-const char str_c_interval3[] PROGMEM = "  2 s";
+const char str_c_interval1[] PROGMEM = " 50 ms";
+const char str_c_interval2[] PROGMEM = "500 ms";
+const char str_c_interval3[] PROGMEM = "  1 s";
 const char str_c_interval4[] PROGMEM = "  5 s";
 const char str_c_interval5[] PROGMEM = " 10 s";
 const char str_c_do_reset[] PROGMEM = "Reset";
+
 
 const char* const _command_labels[] PROGMEM = {
     // [CommandExit] =
@@ -183,27 +184,32 @@ void UserInterface::menuExecuteAction() {
             menuRender();
             break;
         case CommandInterval1:
-            measure->setInterval(500);
+            measure->setInterval(pgm_read_word_near(interval_values));
+            storeSettingsToEEprom();
             resetModeToAuto();
             nextScreen();
             break;
         case CommandInterval2:
-            measure->setInterval(1000);
+            measure->setInterval(pgm_read_word_near(interval_values + 1));
+            storeSettingsToEEprom();
             resetModeToAuto();
             nextScreen();
             break;
         case CommandInterval3:
-            measure->setInterval(2000);
+            measure->setInterval(pgm_read_word_near(interval_values + 2));
+            storeSettingsToEEprom();
             resetModeToAuto();
             nextScreen();
             break;
         case CommandInterval4:
-            measure->setInterval(5000);
+            measure->setInterval(pgm_read_word_near(interval_values + 3));
+            storeSettingsToEEprom();
             resetModeToAuto();
             nextScreen();
             break;
         case CommandInterval5:
-            measure->setInterval(10000);
+            measure->setInterval(pgm_read_word_near(interval_values + 4));
+            storeSettingsToEEprom();
             resetModeToAuto();
             nextScreen();
             break;
@@ -220,16 +226,19 @@ void UserInterface::menuExecuteAction() {
             break;
         case CommandCalibration1:
             measure->setCalibration(Measure::C16V_400);
+            storeSettingsToEEprom();
             resetModeToAuto();
             nextScreen();
             break;
         case CommandCalibration2:
             measure->setCalibration(Measure::C32V_1A);
+            storeSettingsToEEprom();
             resetModeToAuto();
             nextScreen();
             break;
         case CommandCalibration3:
             measure->setCalibration(Measure::C32V_2A);
+            storeSettingsToEEprom();
             resetModeToAuto();
             nextScreen();
             break;
@@ -344,8 +353,7 @@ void UserInterface::renderScreen(Screen scrToRender) {
     }
 }
 
-const char* UserInterface::getCalibrationString(
-    const Measure::Calibration calibration) const {
+const char* UserInterface::getCalibrationString( const Measure::Calibration calibration) const {
     switch (calibration) {
         case Measure::C16V_400:
             return str_c_calibration1;
@@ -355,4 +363,25 @@ const char* UserInterface::getCalibrationString(
             return str_c_calibration3;
     }
     return str_na;
+}
+
+void UserInterface::storeSettingsToEEprom() {
+    uint8_t intervalValueIndex = 0; 
+    uint16_t intervalValue = measure->getInterval();
+    for (uint8_t i = 0; i < 5; i++) {
+        if (pgm_read_word_near(interval_values + i) == intervalValue) {
+            intervalValueIndex = i;
+            break;
+        }
+    }
+    uint8_t calibrationIndex = measure->getCalibration();
+    if (EEPROM.read(eepromSaved) != eepromSavedMagic) {
+        EEPROM.write(eepromSaved, eepromSavedMagic);
+    }    
+    if (EEPROM.read(eepromInterval) != intervalValueIndex) {
+        EEPROM.write(eepromInterval, intervalValueIndex);
+    }
+    if (EEPROM.read(eepromCalibration) != calibrationIndex) {
+        EEPROM.write(eepromCalibration, calibrationIndex);
+    }
 }

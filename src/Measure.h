@@ -41,6 +41,7 @@ class Measure {
             interval(interval), calibration(calibration)//, ina219()
             {};
         void setup();
+        void setup(uint16_t interval, uint8_t calibrationIndex);
         /**
          * Returns true if is's at least <interval> millisec since the last
          * measurement.
@@ -54,7 +55,7 @@ class Measure {
         void resetEnergyEstimate();
         void setCalibration(const Measure::Calibration& cal);
         void setInterval(const unsigned long interval);
-        inline int getInterval() { return interval / timeCorrection;};
+        inline unsigned long getInterval() { return interval / timeCorrection;};
     private: 
         unsigned long interval;
         Calibration calibration;

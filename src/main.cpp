@@ -7,7 +7,7 @@
 
 volatile Button buttonA(PIN_B3);
 volatile Button buttonB(PIN_B4);
-Measure measure(/*delay*/2000 * timeCorrection, Measure::C16V_400);
+Measure measure(/*delay*/1000 * timeCorrection, Measure::C16V_400);
 Display lcd(0x27);
 UserInterface ui(lcd);
 Measurement lastMeasurement(0,0,0,0,0,0,0);
@@ -32,7 +32,19 @@ void setup(void)
 
   buttonA.setup();
   buttonB.setup();
-  measure.setup();
+  if (EEPROM.read(eepromSaved) == eepromSavedMagic) {
+      uint8_t intervalIndex = EEPROM.read(eepromInterval);
+      if (intervalIndex > 4) {
+        intervalIndex = 4;
+      }
+      measure.setup(
+        pgm_read_word_near(interval_values + intervalIndex),
+        EEPROM.read(eepromCalibration)
+      );
+  } else {
+    measure.setup();
+  }
+  
   ui.setup(&measure);
 }
 

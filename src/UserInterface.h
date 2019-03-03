@@ -1,11 +1,19 @@
 #include "Display.h"
 #include "Measure.h"
 #include <assert.h>
+#include <EEPROM.h>
 
 #ifndef INC_USERINTERFACE
 #define INC_USERINTERFACE
 
 enum Menu { MenuMain, MenuCalibration, MenuInterval, MenuResetEnergy };
+
+const uint8_t eepromSavedMagic = 0xF0;
+const uint8_t eepromSaved = 0;
+const uint8_t eepromCalibration = 1;
+const uint8_t eepromInterval = 2;
+
+const PROGMEM uint16_t interval_values[] = {50, 500, 1000, 5000, 10000};
 
 /**
  * We have 16x2 LCD display and 2 buttons (primay and secondary).
@@ -25,11 +33,9 @@ enum Menu { MenuMain, MenuCalibration, MenuInterval, MenuResetEnergy };
  *      - calibration c
  *      - exit
  * - select measurement interval (msec)
- *      - 100 msec
- *      - 250 msec
+ *      - 50 msec
  *      - 500 msec
  *      - 1 sec
- *      - 2 sec
  *      - 5 sec
  *      - 10 sec
  *      - exit
@@ -60,9 +66,9 @@ class UserInterface {
         void menuRender();
         void menuNextCommand();
         void menuExecuteAction();
-        const unsigned long autoModeDelay = 3000 * timeCorrection;
+        const unsigned long autoModeDelay = 5000 * timeCorrection;
         const unsigned long autoUserModeReset = 10000 * timeCorrection;
-        const unsigned long backlightTimeout = 5000 * timeCorrection; 
+        const unsigned long backlightTimeout = 10000 * timeCorrection; 
         unsigned long lastAutoChange = 0;
         unsigned long lastUserInteraction = 0;
         bool backlight = true;
@@ -74,6 +80,7 @@ class UserInterface {
         void nextScreen();
         void renderScreen(Screen scrToRender);
         void resetModeToAuto();
+        void storeSettingsToEEprom();
         friend UserInterface::Screen& operator++(UserInterface::Screen& screen);
         friend UserInterface::Screen operator++(UserInterface::Screen& screen, int);
 };
