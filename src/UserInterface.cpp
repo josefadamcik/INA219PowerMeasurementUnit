@@ -132,7 +132,8 @@ void UserInterface::loop() {
                 lastAutoChange = millis();
                 nextScreen();
                 renderScreen(screen);
-            } else if (measurementUpdated) {
+            } else if (measurementUpdated && lastDisplayUpdate + displayUpdateTimeout <= millis()) {
+                //^ don't render every loop, only once a diplayUpdateTimout.
                 renderScreen(screen);
             }
         } else if (lastUserInteraction + autoUserModeReset <= millis()) {
@@ -140,7 +141,9 @@ void UserInterface::loop() {
             resetModeToAuto();
             screen = Welcome;
             renderScreen(screen);
-        } else if (mode != ModeMenu && measurementUpdated) {
+        } else if (mode != ModeMenu && measurementUpdated &&
+                   lastDisplayUpdate + displayUpdateTimeout <= millis()) {
+            //^ don't render every loop, only once a diplayUpdateTimout.
             renderScreen(screen);
         }
     }
@@ -319,6 +322,7 @@ void UserInterface::nextScreen() {
 
 void UserInterface::renderScreen(Screen scrToRender) {
     measurementUpdated = false;
+    lastDisplayUpdate = millis();
     switch (scrToRender) {
         case Welcome:
             display.printHello(

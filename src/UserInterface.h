@@ -69,8 +69,10 @@ class UserInterface {
         const unsigned long autoModeDelay = 5000 * timeCorrection;
         const unsigned long autoUserModeReset = 10000 * timeCorrection;
         const unsigned long backlightTimeout = 10000 * timeCorrection; 
+        const unsigned long displayUpdateTimeout = 1000 * timeCorrection;
         unsigned long lastAutoChange = 0;
         unsigned long lastUserInteraction = 0;
+        unsigned long lastDisplayUpdate = 0;
         bool backlight = true;
         Button processButtonOnNextLoop = NoButton;
         Screen screen = None;

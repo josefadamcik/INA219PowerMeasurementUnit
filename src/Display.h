@@ -22,9 +22,7 @@ class Display {
         void backlightOn();
         void backlightOff();
         LiquidCrystal_I2C lcd;
-
        private:
-
         // Prevent copying
         Display & operator = (const Display & other);
         Display(const Display & other);
