@@ -1,16 +1,19 @@
 #include "Display.h"
 #include "assert.h"
 
-//see https://maxpromer.github.io/LCD-Character-Creator/
-uint8_t arrow[8] = {0x00, 0x08, 0x0C, 0x0E, 0x0F, 0x0E, 0x0C, 0x08};
+const char str_hello[] PROGMEM = "Hello, INA219";
+const char str_space[] PROGMEM = " ";
+// see https://maxpromer.github.io/LCD-Character-Creator/
+// uint8_t arrow[8] = {0x00, 0x08, 0x0C, 0x0E, 0x0F, 0x0E, 0x0C, 0x08};
+const char arrow[] PROGMEM = {0x00, 0x08, 0x0C, 0x0E, 0x0F, 0x0E, 0x0C, 0x08};
+
 void Display::setup() {
     lcd.init();
     lcd.createChar(0, arrow);
     lcd.backlight();
 }
 
-const char str_hello[] PROGMEM = "Hello, INA219";
-const char str_space[] PROGMEM = " ";
+
 
 void Display::backlightOn() {
     lcd.backlight();
