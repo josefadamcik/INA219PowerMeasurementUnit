@@ -15,7 +15,8 @@ const char unit_mw[] PROGMEM = "mW";
 const char unit_b[] PROGMEM = "b";
 const char unit_s[] PROGMEM = "s";
 const char unit_ma[] PROGMEM = "mA";
-const char unit_mwh[] PROGMEM = "mWh";
+// const char unit_mws[] PROGMEM = "mWs";
+const char unit_uws[] PROGMEM = "uWs";
 
 const char str_na[] PROGMEM = "n/a";
 
@@ -345,8 +346,8 @@ void UserInterface::renderScreen(Screen scrToRender) {
             display.printValue(str_power, lastMeasurement.power_mW, unit_mw);
             break;
         case Energy:
-            display.printValue(str_energy, lastMeasurement.energy_mWh,
-                                unit_mwh);
+            display.printValue(str_energy, lastMeasurement.energy_uWs,
+                                unit_uws);
             break;
         case EnergyTime:
             display.printValue(str_energy_time,

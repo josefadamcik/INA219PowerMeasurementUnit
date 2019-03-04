@@ -41,16 +41,10 @@ void Measure::setInterval(const unsigned long newInterval) {
 const Measurement Measure::doNewMeasurement() {
     float power_mW = ina219.getPower_mW();
     unsigned long now = millis();
-    // Serial.print("now "); Serial.print(now); Serial.print(" last "); Serial.println(lastMeasurement);
     //compute estimated energy
-    //energy = power * time = delta(elergy) + power * delta(time); unit = mW * h = mWh
-    //TODO: beware float arithmetics
+    //energy = power * time = delta(elergy) + power * delta(time); unit = mW * ms = uWs
     unsigned long deltaTime = (now - max(lastMeasurement, energyEstimateResetMillis)) / timeCorrection;
-    float deltaEnergy = (power_mW * deltaTime) / (float)millisInHour ;
-    // Serial.println(power_mW * (now - lastMeasurement));
-    // Serial.println((float)millisInHour);
-    // Serial.println((power_mW * (now - lastMeasurement)) / (float)millisInHour);
-    // Serial.println(deltaEnergy);
+    float deltaEnergy = power_mW * deltaTime;
     energyEstimate += deltaEnergy;
     
     lastMeasurement = now;

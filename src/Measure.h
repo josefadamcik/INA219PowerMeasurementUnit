@@ -16,21 +16,23 @@ class Measurement {
         float current_mA;
         float loadvoltage;
         float power_mW;
-        float energy_mWh; //estimated energy (sum of energyDelta since the last reset)
-        float energyDelta; //power * time (sinec the least measurement)
+        float energy_uWs;     // estimated energy (sum of energyDelta since the
+                              // last reset)
+        float energyDelta;    // power * time (sinec the least measurement)
         unsigned long energyMillis; //elaspsed time since the energy estimeate was reset
-        Measurement(
-            float shuntvoltagea, 
-            float busvoltage, 
-            float current_mA, 
-            float power_mW, 
-            float energy_mWh,
-            unsigned long energyMillis, 
-            float energyDelta) :
-            shuntvoltage(shuntvoltagea), busvoltage(busvoltage), current_mA(current_mA), 
-            loadvoltage(busvoltage + (shuntvoltage / 1000)), 
-            power_mW(power_mW), energy_mWh(energy_mWh), energyDelta(energyDelta), energyMillis(energyMillis) {};
-    private:
+        Measurement(float shuntvoltagea, float busvoltage, float current_mA,
+                    float power_mW, float energy_uWs,
+                    unsigned long energyMillis, float energyDelta)
+            : shuntvoltage(shuntvoltagea),
+              busvoltage(busvoltage),
+              current_mA(current_mA),
+              loadvoltage(busvoltage + (shuntvoltage / 1000)),
+              power_mW(power_mW),
+              energy_uWs(energy_uWs),
+              energyDelta(energyDelta),
+              energyMillis(energyMillis){};
+
+       private:
 };
 
 
